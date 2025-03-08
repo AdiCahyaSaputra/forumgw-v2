@@ -1,4 +1,15 @@
 {
-	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from en!"
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "validation_min": "Minimum {field} length is {length}",
+  "validation_max": "Maximum {field} length is {length}",
+  "login_welcome": "Welcome Back Bro!",
+  "login_detail": "We want to know that you already have a member account",
+  "login_button": "Log-In",
+  "login_question_to_regis": "I want to create an account",
+  "register_title": "Join with us!",
+  "register_detail": "Fill in your full name, email, and the most secure password. The whole world is curious to know who you are!",
+  "register_button": "Register Now",
+  "register_question_to_login": "I think I have an account",
+  "footer_year": "It already use new Date().getFullYear() function 😅",
+  "change_lang_hint": "Change language"
 }

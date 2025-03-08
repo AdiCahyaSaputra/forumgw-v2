@@ -1,4 +1,15 @@
 {
-	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from id!"
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "validation_min": "Minimal panjang {field} cuma {length} karakter",
+  "validation_max": "Maksimal panjang {field} cuma {length} karakter",
+  "login_welcome": "Selamat Datang Bre!",
+  "login_detail": "Kasih tau ke kita kalo lo udah punya akun member nya",
+  "login_button": "Masuk",
+  "login_question_to_regis": "Bikin akun dulu deh",
+  "register_title": "Gabung sama kita!",
+  "register_detail": "Isi nama lengkap, email, dan password yang paling aman yaw. Satu dunia pengen tau lo siapa",
+  "register_button": "Gass Daftar",
+  "register_question_to_login": "Kek nya udah ada akun deh",
+  "footer_year": "Ini udah pake new Date().getFullYear() kok 😅",
+  "change_lang_hint": "#GantiBahasaAjaDulu"
 }

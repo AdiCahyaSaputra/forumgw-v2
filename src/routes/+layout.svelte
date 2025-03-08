@@ -7,5 +7,7 @@
 </script>
 
 <ParaglideJS {i18n}>
-	{@render children()}
+  <div class="selection:bg-black selection:text-white">
+    {@render children()}
+  </div>
 </ParaglideJS>
