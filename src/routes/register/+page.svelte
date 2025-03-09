@@ -29,7 +29,7 @@
 	let { data }: Props = $props();
 
 	const form = superForm(data.form, {
-		validators: zodClient(registerSchema)
+		validators: zodClient(registerSchema())
 	});
 
 	const { form: formData, enhance } = form;
@@ -40,9 +40,11 @@
 		<Tooltip.Provider>
 			<Tooltip.Root>
 				<Tooltip.Trigger>
-					<div>
-						<LangSwitcher />
-					</div>
+					{#snippet child({ props })}
+						<div {...props}>
+							<LangSwitcher />
+						</div>
+					{/snippet}
 				</Tooltip.Trigger>
 				<Tooltip.Content side="left">
 					<p>{m.change_lang_hint()}</p>

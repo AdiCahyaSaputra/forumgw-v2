@@ -1,8 +1,16 @@
 import { z } from 'zod';
+import * as m from '$lib/paraglide/messages.js';
 
-export const loginSchema = z.object({
-  username: z.string().min(5).max(20),
-  password: z.string().min(8).max(10)
-});
+export const loginSchema = () =>
+  z.object({
+    username: z
+      .string()
+      .min(5, m.validation_min({ length: 5, field: 'username' }))
+      .max(20, m.validation_max({ length: 20, field: 'username' })),
+    password: z
+      .string()
+      .min(8, m.validation_min({ length: 8, field: 'password' }))
+      .max(10, m.validation_max({ length: 10, field: 'password' }))
+  });
 
-export type FormSchema = typeof loginSchema;
+export type FormSchema = ReturnType<typeof loginSchema>;
