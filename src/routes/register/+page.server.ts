@@ -2,6 +2,7 @@ import type { Actions, PageServerLoad } from './$types.js';
 import { fail, superValidate } from 'sveltekit-superforms';
 import { registerSchema } from './schema';
 import { zod } from 'sveltekit-superforms/adapters';
+import { registeringNewUser } from '$lib/trpc/services/user.js';
 
 export const load: PageServerLoad = async ({ depends }) => {
   depends('paraglide:lang');
@@ -21,8 +22,18 @@ export const actions: Actions = {
       });
     }
 
+    const response = await registeringNewUser(form.data);
+
+    if (response.status !== 201) {
+      return fail(response.status, {
+        form,
+        message: response.message
+      });
+    }
+
     return {
-      form
+      form,
+      ...response
     };
   }
 };

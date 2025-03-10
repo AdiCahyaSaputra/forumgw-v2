@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { registerSchema, type FormSchema } from './schema';
+	import { registerSchema, type RegisterSchema } from './schema';
 	import * as m from '$lib/paraglide/messages.js';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -16,24 +16,48 @@
 	} from '$lib/components/ui/card';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Button } from '$lib/components/ui/button';
-	import { ChevronRight, Users } from '@lucide/svelte';
+	import { ChevronRight, Loader, Users } from '@lucide/svelte';
 	import { languageTag } from '$lib/paraglide/runtime';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import type { ActionResult } from '@sveltejs/kit';
+	import { toast } from 'svelte-sonner';
+	import { goto } from '$app/navigation';
 
 	type Props = {
 		data: {
-			form: SuperValidated<Infer<FormSchema>>;
+			form: SuperValidated<Infer<RegisterSchema>>;
 		};
 	};
 
 	let { data }: Props = $props();
 
 	const form = superForm(data.form, {
-		validators: zodClient(registerSchema())
+		validators: zodClient(registerSchema()),
+		onResult: async ({ result }) => {
+			formResult = result;
+
+			switch (result.type) {
+				case 'failure':
+					toast.error(result.data?.message || m.global_error_message());
+					break;
+				case 'success':
+					await goto('/login', { replaceState: true });
+					break;
+				default:
+					toast.error(m.global_error_message());
+			}
+		}
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, submitting } = form;
+
+	let formResult: ActionResult | null = $state(null);
 </script>
+
+<svelte:head>
+	<title>Register</title>
+	<meta name="description" content="Fullstack ForumGW app built with SvelteKit" />
+</svelte:head>
 
 <main class="min-h-screen flex flex-col justify-between items-center relative">
 	<div class="absolute top-4 right-4">
@@ -100,16 +124,28 @@
 									class="mt-2"
 									bind:value={$formData.password}
 									placeholder="Password"
+									type="password"
 								/>
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Button class="mt-4 w-full font-bold flex justify-between items-center">
+					<Form.Button
+						disabled={$submitting || formResult?.type === 'success'}
+						class="mt-4 w-full font-bold flex justify-between items-center"
+					>
 						<span>
-							{m.register_button()}
+							{#if formResult?.type === 'success'}
+								{m.register_button_success()}
+							{:else}
+								{m.register_button()}
+							{/if}
 						</span>
-						<ChevronRight />
+						{#if $submitting || formResult?.type === 'success'}
+							<Loader class="animate-spin" />
+						{:else}
+							<ChevronRight />
+						{/if}
 					</Form.Button>
 				</form>
 			</CardContent>
