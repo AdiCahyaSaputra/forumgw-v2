@@ -13,4 +13,4 @@ export const loginSchema = () =>
       .max(10, m.validation_max({ length: 10, field: 'password' }))
   });
 
-export type FormSchema = ReturnType<typeof loginSchema>;
+export type LoginSchema = ReturnType<typeof loginSchema>;

@@ -17,4 +17,4 @@ export const registerSchema = () =>
       .max(10, m.validation_max({ length: 10, field: 'password' }))
   });
 
-export type FormSchema = ReturnType<typeof registerSchema>;
+export type RegisterSchema = ReturnType<typeof registerSchema>;

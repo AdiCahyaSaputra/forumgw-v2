@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { loginSchema, type FormSchema } from './schema';
+	import { loginSchema, type LoginSchema } from './schema';
 	import * as m from '$lib/paraglide/messages.js';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -14,26 +14,50 @@
 		CardHeader,
 		CardTitle
 	} from '$lib/components/ui/card';
+	import { toast } from 'svelte-sonner';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Button } from '$lib/components/ui/button';
-	import { ChevronRight, HandMetal } from '@lucide/svelte';
+	import { ChevronRight, HandMetal, Loader } from '@lucide/svelte';
 	import { languageTag } from '$lib/paraglide/runtime';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import type { ActionResult } from '@sveltejs/kit';
+	import { goto } from '$app/navigation';
 
 	type Props = {
 		data: {
-			form: SuperValidated<Infer<FormSchema>>;
-		};
+			form: SuperValidated<Infer<LoginSchema>>;
+		}; // PageData coming from PageServerLoad
 	};
 
 	let { data }: Props = $props();
 
-	const form = superForm(data.form, {
-		validators: zodClient(loginSchema())
+	let form = superForm(data.form, {
+		validators: zodClient(loginSchema()),
+		onResult: async ({ result }) => {
+			formResult = result;
+
+			switch (result.type) {
+				case 'failure':
+					toast.error(result.data?.message || m.global_error_message());
+					break;
+				case 'success':
+					await goto('/discussion', { replaceState: true });
+					break;
+				default:
+					toast.error(m.global_error_message());
+			}
+		}
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, submitting } = form;
+
+	let formResult: ActionResult | null = $state(null);
 </script>
+
+<svelte:head>
+	<title>Log-In</title>
+	<meta name="description" content="Fullstack ForumGW app built with SvelteKit" />
+</svelte:head>
 
 <main class="min-h-screen flex flex-col justify-between items-center relative">
 	<div class="absolute top-4 right-4">
@@ -68,7 +92,7 @@
 			</CardHeader>
 
 			<CardContent class="px-0 py-0 pt-4">
-				<form method="POST" use:enhance class="mt-4">
+				<form method="POST" class="mt-4" use:enhance>
 					<Form.Field {form} name="username">
 						<Form.Control>
 							{#snippet children({ props })}
@@ -91,16 +115,28 @@
 									class="mt-2"
 									bind:value={$formData.password}
 									placeholder="Password"
+									type="password"
 								/>
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Button class="mt-4 w-full font-bold flex justify-between items-center">
+					<Form.Button
+						disabled={$submitting || formResult?.type === 'success'}
+						class="mt-4 w-full font-bold flex justify-between items-center"
+					>
 						<span>
-							{m.login_button()}
+							{#if formResult?.type === 'success'}
+								{m.login_button_success()}
+							{:else}
+								{m.login_button()}
+							{/if}
 						</span>
-						<ChevronRight />
+						{#if $submitting || formResult?.type === 'success'}
+							<Loader class="animate-spin" />
+						{:else}
+							<ChevronRight />
+						{/if}
 					</Form.Button>
 				</form>
 			</CardContent>
