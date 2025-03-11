@@ -18,5 +18,18 @@
   "register_button_success": "Teleport to login pages",
   "register_question_to_login": "I think I have an account",
   "footer_year": "It already use new Date().getFullYear() function 😅",
-  "change_lang_hint": "Change language"
+  "change_lang_hint": "Change language",
+  "nav_title_category": "Discussion Category",
+  "nav_title_dashboard": "Dashboard",
+  "nav_title_setting": "Setting",
+  "nav_item_discussion": "Discussion",
+  "nav_item_group": "Community Group",
+  "nav_item_manage_post": "Manage Posts",
+  "nav_item_manage_group": "Manage Groups",
+  "nav_item_account": "Your Account",
+  "nav_item_notification": "Notifications",
+  "nav_item_invite": "Group Invitations",
+  "see_profile": "See Profile",
+  "mobile_open_menu": "Open Menu",
+  "mobile_close_menu": "Close Menu"
 }

@@ -18,5 +18,18 @@
   "register_button_success": "Teleportasi ke menu login",
   "register_question_to_login": "Kek nya udah ada akun deh",
   "footer_year": "Ini udah pake new Date().getFullYear() kok 😅",
-  "change_lang_hint": "#GantiBahasaAjaDulu"
+  "change_lang_hint": "#GantiBahasaAjaDulu",
+  "nav_title_category": "Kategori Diskusi",
+  "nav_title_dashboard": "Dashboard",
+  "nav_title_setting": "Pengaturan",
+  "nav_item_discussion": "Diskusi",
+  "nav_item_group": "Grup Komunitas",
+  "nav_item_manage_post": "Kelola Post",
+  "nav_item_manage_group": "Kelola Grup",
+  "nav_item_account": "Akun Dirimu",
+  "nav_item_notification": "Notifikasi",
+  "nav_item_invite": "Undangan Grup",
+  "see_profile": "Lihat Profil",
+  "mobile_open_menu": "Buka Menu",
+  "mobile_close_menu": "Tutup Menu"
 }
