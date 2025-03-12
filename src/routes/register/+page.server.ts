@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from './$types.js';
 import { fail, superValidate } from 'sveltekit-superforms';
-import { registerSchema } from './schema';
+import { registerSchema } from '$lib/trpc/schema/registerSchema.js';
 import { zod } from 'sveltekit-superforms/adapters';
 import { registeringNewUser } from '$lib/trpc/services/user.js';
 

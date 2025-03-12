@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { loginSchema, type LoginSchema } from './schema';
+	import { loginSchema, type LoginSchema } from '$lib/trpc/schema/loginSchema.js';
 	import * as m from '$lib/paraglide/messages.js';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -101,6 +101,8 @@
 									class="mt-2"
 									bind:value={$formData.username}
 									placeholder="Username"
+                  autofocus
+                  autocomplete="off"
 								/>
 							{/snippet}
 						</Form.Control>

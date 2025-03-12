@@ -1,6 +1,6 @@
 import { t } from '../t';
 import { logger } from '$lib/trpc/middleware/logger';
-import { loginSchema } from '../../../routes/login/schema';
+import { loginSchema } from '$lib/trpc/schema/loginSchema';
 import { sendTRPCResponse } from '../helper';
 
 export const user = t.router({

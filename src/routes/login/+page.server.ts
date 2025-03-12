@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from './$types.js';
 import { fail, superValidate } from 'sveltekit-superforms';
-import { loginSchema } from './schema';
+import { loginSchema } from '$lib/trpc/schema/loginSchema.js';
 import { zod } from 'sveltekit-superforms/adapters';
 import { authenticateUser } from '$lib/trpc/services/user.js';
 
@@ -36,7 +36,7 @@ export const actions: Actions = {
       path: '/'
     });
 
-    event.cookies.set('REFRESH_TOKEN', response.data?.refreshToken, {
+    event.cookies.set('REFRESH_TOKEN', response.data.refreshToken, {
       expires: new Date(Date.now() + 24 * (60 * 60 * 1000)),
       path: '/'
     });

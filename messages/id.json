@@ -31,5 +31,10 @@
   "nav_item_invite": "Undangan Grup",
   "see_profile": "Lihat Profil",
   "mobile_open_menu": "Buka Menu",
-  "mobile_close_menu": "Tutup Menu"
+  "mobile_close_menu": "Tutup Menu",
+  "post_created_at": "Diposting saat",
+  "post_report_title": "Kasih Tau Admin Bre!",
+  "post_report_message": "Mungkin postingan ini mengandung sesuatu yang gak bener nih",
+  "post_report_error_not_found_id": "Ni yang mau di report post yang mana bre?",
+  "post_report_success": "Makasih yah udah bantu report!"
 }

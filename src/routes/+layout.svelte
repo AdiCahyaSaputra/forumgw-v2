@@ -8,7 +8,7 @@
 </script>
 
 <ParaglideJS {i18n}>
-	<Toaster richColors />
+	<Toaster richColors position="top-right" />
 	<div class="selection:bg-black selection:text-white">
 		{@render children()}
 	</div>

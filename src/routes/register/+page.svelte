@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { registerSchema, type RegisterSchema } from './schema';
+	import { registerSchema, type RegisterSchema } from '$lib/trpc/schema/registerSchema.js';
 	import * as m from '$lib/paraglide/messages.js';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -96,7 +96,14 @@
 					<Form.Field {form} name="name">
 						<Form.Control>
 							{#snippet children({ props })}
-								<Input {...props} class="mt-2" bind:value={$formData.name} placeholder="Fullname" />
+								<Input
+									{...props}
+									class="mt-2"
+									bind:value={$formData.name}
+									placeholder="Fullname"
+									autofocus
+									autocomplete="off"
+								/>
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />

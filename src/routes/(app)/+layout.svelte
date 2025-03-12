@@ -21,6 +21,15 @@
 	import type { ActionResult } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
+	import type { UserPayload } from '$lib/trpc/services/user.js';
+	import type { Snippet } from 'svelte';
+
+	type Props = {
+		data: {
+			user: UserPayload | null;
+		};
+		children: Snippet;
+	};
 
 	const navCategoryItems = [
 		{
@@ -57,14 +66,14 @@
 		}
 	];
 
-	let { children } = $props();
+	let { data, children }: Props = $props();
 
 	let openAside = $state(false);
 	let isLoggingOut = $state(false);
 	let formResult: ActionResult | null = $state(null);
 </script>
 
-<Navbar />
+<Navbar user={data.user} />
 <div class="flex items-start relative">
 	<aside
 		class={`
@@ -111,8 +120,8 @@
 		<div>
 			<div class="flex items-start gap-2 bg-white border p-4 rounded-md">
 				<Avatar.Root class="rounded-md border">
-					<Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
-					<Avatar.Fallback class="bg-white">CN</Avatar.Fallback>
+					<Avatar.Image src={data.user?.image} alt="@shadcn" />
+					<Avatar.Fallback class="bg-white">{data.user?.username[0].toUpperCase()}</Avatar.Fallback>
 				</Avatar.Root>
 				<div class="flex items-start grow justify-between">
 					<div>
@@ -126,12 +135,13 @@
 							{/snippet}
 							{#snippet children()}
 								<h3 class="text-sm leading-none font-bold">
-									<!-- {user.username} -->
-									{'@adics'.slice(0, 20)}
+									{`@${data.user?.username}`.slice(0, 20)}
 								</h3>
 							{/snippet}
 						</LoadingState>
-						<a href={`/profil/`} class="text-xs hover:underline">{m.see_profile()}</a>
+						<a href={`/profil/${data.user?.username}`} class="text-xs hover:underline"
+							>{m.see_profile()}</a
+						>
 					</div>
 					<form
 						method="POST"
@@ -194,7 +204,7 @@
 			<span>{m.mobile_open_menu()}</span>
 		</Button>
 	</div>
-	<main class="grow p-4 min-h-screen">
+	<main class="grow min-h-screen h-[2000px]">
 		{@render children()}
 	</main>
 </div>

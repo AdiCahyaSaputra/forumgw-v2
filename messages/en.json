@@ -31,5 +31,10 @@
   "nav_item_invite": "Group Invitations",
   "see_profile": "See Profile",
   "mobile_open_menu": "Open Menu",
-  "mobile_close_menu": "Close Menu"
+  "mobile_close_menu": "Close Menu",
+  "post_created_at": "Posted at",
+  "post_report_title": "Admin Should Know!",
+  "post_report_message": "This post may contain unappropriate content, report it!",
+  "post_report_error_not_found_id": "I dont know which post should i report it",
+  "post_report_success": "Thank you for reporting!"
 }

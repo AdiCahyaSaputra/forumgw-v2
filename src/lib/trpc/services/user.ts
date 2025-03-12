@@ -1,17 +1,26 @@
 import { db } from '$lib/server/db';
 import { jwts, users } from '$lib/server/db/schema';
-import { SignJWT } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 import { nanoid } from 'nanoid';
 import { env } from '$env/dynamic/private';
-import type { LoginSchema } from '../../../routes/login/schema.ts';
-import type { RegisterSchema } from '../../../routes/register/schema.ts';
+import type { LoginSchema } from '$lib/trpc/schema/loginSchema.js';
+import type { RegisterSchema } from '$lib/trpc/schema/registerSchema.js';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { and, eq, gt, sql } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import * as m from '$lib/paraglide/messages.js';
 import { sendTRPCResponse } from '$lib/utils.js';
+import type { RequestEvent } from '@sveltejs/kit';
+import { JWT_SECRET } from '$env/static/private';
 
 type User = typeof users.$inferSelect;
+export type UserPayload = {
+  id: User['id'];
+  name: User['name'];
+  username: User['username'];
+  image: User['image'];
+};
+type JWTPayload = Omit<typeof jwts.$inferSelect, 'userId'>;
 
 export const createJWT = async (userId: User['id']) => {
   try {
@@ -55,6 +64,94 @@ export const createJWT = async (userId: User['id']) => {
       refreshToken: null
     };
   }
+};
+
+export const refreshJWT = async (refreshToken: string) => {
+  const decodedPayload = await jwtVerify(refreshToken, new TextEncoder().encode(JWT_SECRET))
+    .then((decoded) => decoded.payload as JWTPayload)
+    .catch(() => null);
+
+  if (decodedPayload) {
+    const usersFromToken = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        username: users.username,
+        image: users.image
+      })
+      .from(jwts)
+      .leftJoin(users, eq(jwts.userId, users.id))
+      .where(and(eq(jwts.id, decodedPayload.id), gt(jwts.expiredIn, sql`NOW()`)))
+      .limit(1);
+
+    if (usersFromToken.length > 0) {
+      return {
+        user: usersFromToken[0] as UserPayload
+      };
+    }
+  }
+
+  return { user: null }; // When decodedPayload are null and usersFromToken.length is < 1
+};
+
+export const verifyUserToken = async (
+  event: RequestEvent
+): Promise<{ user: UserPayload | null }> => {
+  let token = event.cookies.get('TOKEN');
+  let refreshToken = event.cookies.get('REFRESH_TOKEN');
+
+  if (!token) {
+    if (refreshToken) {
+      const payload = await refreshJWT(refreshToken);
+
+      if (payload.user) {
+        const { token: newToken, refreshToken: newRefreshToken } = await createJWT(payload.user.id);
+
+        if (newToken && newRefreshToken) {
+          event.cookies.set('TOKEN', newToken, {
+            expires: new Date(Date.now() + 2 * (60 * 60 * 1000)),
+            path: '/'
+          });
+
+          event.cookies.set('REFRESH_TOKEN', newRefreshToken, {
+            expires: new Date(Date.now() + 24 * (60 * 60 * 1000)),
+            path: '/'
+          });
+
+          token = newToken;
+          refreshToken = newRefreshToken;
+        }
+      }
+    }
+
+    return { user: null }; // When refreshToken, payload.user, newToken, newRefreshToken are undefined or null
+  }
+
+  const decodedPayload = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET))
+    .then((decoded) => decoded.payload as JWTPayload)
+    .catch(() => null);
+
+  if (decodedPayload) {
+    const usersFromToken = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        username: users.username,
+        image: users.image
+      })
+      .from(jwts)
+      .leftJoin(users, eq(jwts.userId, users.id))
+      .where(and(eq(jwts.id, decodedPayload.id), gt(jwts.expiredIn, sql`NOW()`)))
+      .limit(1);
+
+    if (usersFromToken.length > 0) {
+      return {
+        user: usersFromToken[0] as UserPayload
+      };
+    }
+  }
+
+  return { user: null }; // When decodedPayload are null and usersFromToken.length is < 1
 };
 
 export const authenticateUser = async (formData: z.infer<LoginSchema>) => {
