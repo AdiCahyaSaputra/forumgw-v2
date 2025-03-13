@@ -53,8 +53,10 @@
 
 	<div class="px-4 pb-4">
 		<small class="text-foreground/60">{m.post_created_at()} 2 hari yang lalu</small>
-		<div class="py-2">
-			<Badge variant="outline" class="cursor-pointer hover:bg-slate-100">#dev</Badge>
+		<div class="py-2 flex gap-1">
+			{#each post.tags as tagName, idx (idx)}
+				<Badge variant="outline" class="cursor-pointer hover:bg-slate-100">#{tagName}</Badge>
+			{/each}
 		</div>
 		<p class="cst-wrap-text">{post.content}</p>
 	</div>

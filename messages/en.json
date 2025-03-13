@@ -36,5 +36,10 @@
   "post_report_title": "Admin Should Know!",
   "post_report_message": "This post may contain unappropriate content, report it!",
   "post_report_error_not_found_id": "I dont know which post should i report it",
-  "post_report_success": "Thank you for reporting!"
+  "post_report_success": "Thank you for reporting!",
+  "post_button_new": "New Discussion",
+  "post_form_title": "What Happen? Tell Us!",
+  "post_form_message": "Don't you dare to XSS-ing this input 😊",
+  "post_form_is_not_anonymous": "Mode Public",
+  "post_form_is_anonymous": "Mode Anonymous"
 }

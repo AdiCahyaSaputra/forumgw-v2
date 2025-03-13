@@ -57,5 +57,8 @@ export const actions: Actions = {
         message: m.post_report_error_not_found_id()
       });
     }
+  },
+  createNewPost: async (event) => {
+    const form = await event.request.formData();
   }
 };

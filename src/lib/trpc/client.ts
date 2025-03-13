@@ -8,7 +8,10 @@ export function trpc(init?: TRPCClientInit) {
   const isBrowser = typeof window !== 'undefined';
   if (isBrowser && browserClient) return browserClient;
 
-  const client = createTRPCClient<Router>({ init, transformer });
+  const client = createTRPCClient<Router>({
+    init,
+    transformer
+  });
   if (isBrowser) browserClient = client;
 
   return client;

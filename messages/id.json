@@ -36,5 +36,10 @@
   "post_report_title": "Kasih Tau Admin Bre!",
   "post_report_message": "Mungkin postingan ini mengandung sesuatu yang gak bener nih",
   "post_report_error_not_found_id": "Ni yang mau di report post yang mana bre?",
-  "post_report_success": "Makasih yah udah bantu report!"
+  "post_report_success": "Makasih yah udah bantu report!",
+  "post_button_new": "Diskusi Baru",
+  "post_form_title": "Kenapa Nih? Kasih Tau Kita!",
+  "post_form_message": "Tapi jangan nge-XSS-in Inputan ini ya 😊",
+  "post_form_is_not_anonymous": "Mode Publik",
+  "post_form_is_anonymous": "Mode Anonim"
 }

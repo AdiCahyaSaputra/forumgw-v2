@@ -31,11 +31,18 @@
 
 	let { data }: Props = $props();
 
+  let loginLoading = $state(false);
+
 	let form = superForm(data.form, {
 		validators: zodClient(loginSchema()),
+    onSubmit: () => {
+      loginLoading = true;
+    },
 		onResult: async ({ result }) => {
 			formResult = result;
-
+      loginLoading = false;
+		},
+		onUpdate: async ({ result }) => {
 			switch (result.type) {
 				case 'failure':
 					toast.error(result.data?.message || m.global_error_message());
@@ -46,10 +53,13 @@
 				default:
 					toast.error(m.global_error_message());
 			}
+		},
+		onError: () => {
+			toast.error(m.global_error_message());
 		}
 	});
 
-	const { form: formData, enhance, submitting } = form;
+	const { form: formData, enhance } = form;
 
 	let formResult: ActionResult | null = $state(null);
 </script>
@@ -101,8 +111,8 @@
 									class="mt-2"
 									bind:value={$formData.username}
 									placeholder="Username"
-                  autofocus
-                  autocomplete="off"
+									autofocus
+									autocomplete="off"
 								/>
 							{/snippet}
 						</Form.Control>
@@ -124,7 +134,7 @@
 						<Form.FieldErrors />
 					</Form.Field>
 					<Form.Button
-						disabled={$submitting || formResult?.type === 'success'}
+						disabled={loginLoading || formResult?.type === 'success'}
 						class="mt-4 w-full font-bold flex justify-between items-center"
 					>
 						<span>
@@ -134,7 +144,7 @@
 								{m.login_button()}
 							{/if}
 						</span>
-						{#if $submitting || formResult?.type === 'success'}
+						{#if loginLoading || formResult?.type === 'success'}
 							<Loader class="animate-spin" />
 						{:else}
 							<ChevronRight />

@@ -63,6 +63,7 @@ export const getPublicPostDiscussions = async (
     .groupBy(
       // Include Non-Aggregated Column or ERROR
       posts.id,
+      posts.userId,
       posts.anonymousId,
       posts.content,
       posts.createdAt,

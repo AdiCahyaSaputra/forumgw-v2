@@ -31,11 +31,18 @@
 
 	let { data }: Props = $props();
 
+	let registerLoading = $state(false);
+
 	const form = superForm(data.form, {
 		validators: zodClient(registerSchema()),
+		onSubmit: () => {
+			registerLoading = true;
+		},
 		onResult: async ({ result }) => {
 			formResult = result;
-
+			registerLoading = false;
+		},
+		onUpdate: async ({ result }) => {
 			switch (result.type) {
 				case 'failure':
 					toast.error(result.data?.message || m.global_error_message());
@@ -46,6 +53,9 @@
 				default:
 					toast.error(m.global_error_message());
 			}
+		},
+		onError: () => {
+			toast.error(m.global_error_message());
 		}
 	});
 
@@ -138,7 +148,7 @@
 						<Form.FieldErrors />
 					</Form.Field>
 					<Form.Button
-						disabled={$submitting || formResult?.type === 'success'}
+						disabled={registerLoading || formResult?.type === 'success'}
 						class="mt-4 w-full font-bold flex justify-between items-center"
 					>
 						<span>
@@ -148,7 +158,7 @@
 								{m.register_button()}
 							{/if}
 						</span>
-						{#if $submitting || formResult?.type === 'success'}
+						{#if registerLoading || formResult?.type === 'success'}
 							<Loader class="animate-spin" />
 						{:else}
 							<ChevronRight />
