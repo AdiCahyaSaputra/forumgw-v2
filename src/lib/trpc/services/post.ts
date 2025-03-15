@@ -1,21 +1,30 @@
+import * as m from '$lib/paraglide/messages.js';
 import { db } from '$lib/server/db';
 import { anonymous, comments, posts, reports, tagPosts, tags, users } from '$lib/server/db/schema';
 import { sendTRPCResponse } from '$lib/utils';
-import { and, count, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { and, count, eq, inArray, isNull, lt, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import type { getPublicPostDiscussionsRequest, reportPostRequest } from '../schema/postSchema';
-import * as m from '$lib/paraglide/messages.js';
+import type {
+  createPostRequest,
+  getPublicPostDiscussionsRequest,
+  reportPostRequest
+} from '../schema/postSchema';
 
 export const getPublicPostDiscussions = async (
   input: z.infer<ReturnType<typeof getPublicPostDiscussionsRequest>>
 ) => {
+  const limit = 10;
   const conditions = [
     // This is not Group Posts. This is public post only
-    isNull(posts.groupId)
+    isNull(posts.groupId),
   ];
 
   if (input.tagIds.length > 0) {
     conditions.push(inArray(tags.id, input.tagIds));
+  }
+
+  if(input.cursor) {
+    conditions.push(lt(posts.id, input.cursor));
   }
 
   const results = await db
@@ -70,15 +79,109 @@ export const getPublicPostDiscussions = async (
       users.name,
       users.username,
       users.image
-    );
+    )
+    .orderBy(sql`created_at DESC`)
+    .limit(limit + 1);
+
+  const hasNextPage = results.length > limit;
+  const paginatedResults = results.slice(0, limit);
+  const nextCursor = hasNextPage ? paginatedResults[limit - 1].id : null;
 
   return sendTRPCResponse(
     {
       status: results.length > 0 ? 200 : 404,
       message: 'ok'
     },
-    results
+    {
+      posts: paginatedResults,
+      nextCursor,
+      hasNextPage
+    }
   );
+};
+
+export const createNewPost = async (
+  input: z.infer<ReturnType<typeof createPostRequest>>,
+  userId: (typeof users.$inferSelect)['id']
+) => {
+  const { isAnonymous, content, tags: tagsString } = input;
+  const tagsName = tagsString.split(',');
+
+  try {
+    const trpcResponse = await db.transaction(async (tx) => {
+      let anonymousUserId: (typeof anonymous.$inferSelect)['id'] | null = null;
+
+      if (isAnonymous) {
+        const isAnonymousUserExists = await tx
+          .select({ id: anonymous.id })
+          .from(anonymous)
+          .where(eq(anonymous.userId, userId))
+          .limit(1);
+
+        if (isAnonymousUserExists.length > 0) {
+          anonymousUserId = isAnonymousUserExists[0].id;
+        } else {
+          const [newAnonymousUser] = await tx
+            .insert(anonymous)
+            .values({ userId })
+            .returning({ id: anonymous.id });
+
+          anonymousUserId = newAnonymousUser.id;
+        }
+      }
+
+      const [newPost] = await tx
+        .insert(posts)
+        .values({
+          content,
+          ...(isAnonymous ? { anonymousId: anonymousUserId } : { userId })
+        })
+        .returning({ id: posts.id });
+
+      if (tagsName.length > 0) {
+        const existingTags = await tx
+          .select({ name: tags.name, id: tags.id })
+          .from(tags)
+          .where(inArray(tags.name, tagsName));
+
+        const tagsData = tagsName
+          .filter((tagName) => !existingTags.find((tag) => tagName === tag.name))
+          .map((name) => ({ name }));
+
+        let newTags: typeof existingTags = [];
+
+        if (tagsData.length > 0) {
+          newTags = await tx.insert(tags).values(tagsData).returning({
+            id: tags.id,
+            name: tags.name
+          });
+        }
+
+        const tagPostsData = [...existingTags, ...newTags].map((tag) => ({
+          tagId: tag.id,
+          postId: newPost.id
+        }));
+
+        if (tagPostsData.length > 0) {
+          await tx.insert(tagPosts).values(tagPostsData);
+        }
+      }
+
+      return sendTRPCResponse({
+        status: 201,
+        message: m.post_create_success()
+      });
+    });
+
+    return trpcResponse;
+  } catch (error) {
+    console.error('Transaction failed:', error);
+
+    return sendTRPCResponse({
+      status: 500,
+      message: m.global_error_message()
+    });
+  }
 };
 
 export const reportPost = async (input: z.infer<typeof reportPostRequest>) => {

@@ -7,7 +7,7 @@
 		children: Snippet;
 	};
 
-	const { isLoading, loadingFallback, children } = $props();
+	const { isLoading, loadingFallback, children }: Props = $props();
 </script>
 
 {#if isLoading}

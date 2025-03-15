@@ -1,0 +1,152 @@
+<script lang="ts">
+	import { page } from '$app/stores';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Command from '$lib/components/ui/command/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { trpc } from '$lib/trpc/client';
+	import { Tags, X } from '@lucide/svelte';
+	import { tick } from 'svelte';
+	import { writable } from 'svelte/store';
+
+	type Props = {
+		tags: string[];
+	};
+
+	let { tags = $bindable() }: Props = $props();
+
+	let tagSearch = $state('');
+	let tagSearchFilter = writable<{ name: string }>({ name: '' });
+	let open = $state(false);
+	let triggerRef = $state<HTMLButtonElement>(null!);
+
+	const allTags = trpc($page).tag.getAllTags.createQuery(tagSearchFilter);
+
+	const filteredTags = $derived.by(() => {
+		const tags = $allTags.data?.data.tags;
+
+		let data: typeof tags = [];
+
+		if (tags) {
+			data =
+				tagSearch === ''
+					? tags
+					: tags.filter((tag) => tag.name.toLowerCase().includes(tagSearch.toLowerCase()));
+		}
+
+		return data;
+	});
+
+	function closeAndFocusTrigger() {
+		open = false;
+		tick().then(() => {
+			triggerRef.focus();
+		});
+	}
+
+	$effect(() => {
+		console.log(tagSearch, ' Dari effect');
+
+		const timeout = setTimeout(() => {
+			const isExists = $allTags.data?.data.tags.find(
+				(tag) => tag.name.toLowerCase() === tagSearch.toLowerCase()
+			)?.name;
+
+			if (!isExists) {
+				$tagSearchFilter.name = tagSearch; // Only trigger refetch when current 10 tags is not match with tagSearch
+			}
+		}, 1000);
+
+		return () => {
+			clearTimeout(timeout);
+		};
+	});
+</script>
+
+<div class="flex flex-col mt-2 gap-2">
+	<div class="max-w-80 flex flex-wrap gap-2">
+		{#each tags as tagName, idx (idx)}
+			<Button
+				variant="outline"
+				onclick={() => {
+					const clonedTags = [...tags];
+					const deletedTagIdx = tags.indexOf(tagName);
+
+					clonedTags.splice(deletedTagIdx, 1);
+
+					tags = clonedTags;
+				}}
+        size="sm"
+			>
+				<span>
+					#{tagName}
+				</span>
+				<X />
+			</Button>
+		{/each}
+	</div>
+
+	<Popover.Root bind:open>
+		<Popover.Trigger bind:ref={triggerRef}>
+			{#snippet child({ props })}
+				<Button
+					variant="default"
+					class="w-full justify-between"
+					{...props}
+					role="combobox"
+					aria-expanded={open}
+					size="sm"
+				>
+					Tags (Optional)
+					<Tags />
+				</Button>
+			{/snippet}
+		</Popover.Trigger>
+		<Popover.Content class="w-[200px] p-0" align="start">
+			<Command.Root
+				onStateChange={(state) => {
+					tagSearch = state.search;
+				}}
+				shouldFilter={false}
+			>
+				<Command.Input placeholder="Tag Name..." />
+				<Command.List>
+					<Command.Group>
+						{#if filteredTags.length > 0}
+							{#each filteredTags as tag, idx (idx)}
+								<Command.Item
+									value={tag.name}
+									onSelect={() => {
+										if (!tags.includes(tag.name)) {
+											tags = [...tags, tag.name];
+										}
+
+										closeAndFocusTrigger();
+									}}
+									class="flex justify-between"
+								>
+									<span>#{tag.name}</span>
+									<span class="font-bold">{tag._count.post}</span>
+								</Command.Item>
+							{/each}
+						{:else}
+							<Command.Item
+								value={tagSearch}
+								onSelect={() => {
+									if (!tags.includes(tagSearch)) {
+										tags = [...tags, tagSearch];
+									}
+
+									closeAndFocusTrigger();
+								}}
+								class="flex justify-between"
+							>
+								<span>#{tagSearch}</span>
+								<span class="font-bold">0</span>
+							</Command.Item>
+						{/if}
+					</Command.Group>
+				</Command.List>
+			</Command.Root>
+		</Popover.Content>
+	</Popover.Root>
+</div>

@@ -49,8 +49,10 @@
 				/>
 
 				<Drawer.Footer class="p-0 pt-4">
-					<Button type="submit">Submit</Button>
-					<Drawer.Close>Cancel</Drawer.Close>
+					<Button type="submit">{m.post_report_button_submit()}</Button>
+					<Drawer.Close type="button" class="cursor-pointer"
+						>{m.post_report_button_cancel()}</Drawer.Close
+					>
 				</Drawer.Footer>
 			</form>
 		</div>

@@ -5,6 +5,7 @@
 	import { MessageSquare } from '@lucide/svelte';
 	import ReportPostDialog from './ReportPostDialog.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { timeAgo } from '$lib/utils';
 
 	type Props = {
 		post: {
@@ -52,12 +53,14 @@
 	</div>
 
 	<div class="px-4 pb-4">
-		<small class="text-foreground/60">{m.post_created_at()} 2 hari yang lalu</small>
-		<div class="py-2 flex gap-1">
-			{#each post.tags as tagName, idx (idx)}
-				<Badge variant="outline" class="cursor-pointer hover:bg-slate-100">#{tagName}</Badge>
-			{/each}
-		</div>
+		<small class="text-foreground/60">{m.post_created_at()} {timeAgo(post.cretedAt)}</small>
+		{#if post.tags.length > 0}
+			<div class="py-2 flex gap-1">
+				{#each post.tags as tagName, idx (idx)}
+					<Badge variant="outline" class="cursor-pointer hover:bg-slate-100">#{tagName}</Badge>
+				{/each}
+			</div>
+		{/if}
 		<p class="cst-wrap-text">{post.content}</p>
 	</div>
 

@@ -29,17 +29,10 @@ export const roles = pgTable('role', {
 // Anonymous table
 export const anonymous = pgTable('anonymous', {
   id: uuid('id').primaryKey().defaultRandom(),
-  username: varchar('username').notNull(),
   userId: uuid('user_id')
     .notNull()
     .unique()
     .references(() => users.id, { onDelete: 'cascade' })
-});
-
-// Category table
-export const categories = pgTable('category', {
-  id: serial('id').primaryKey(),
-  name: varchar('name').notNull()
 });
 
 // Tag table
@@ -65,9 +58,6 @@ export const posts = pgTable('post', {
   content: varchar('content', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-  categoryId: integer('category_id')
-    .notNull()
-    .references(() => categories.id),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
   anonymousId: uuid('anonymous_id').references(() => anonymous.id, { onDelete: 'cascade' }),
   groupId: uuid('group_id').references(() => groups.id, { onDelete: 'cascade' })
