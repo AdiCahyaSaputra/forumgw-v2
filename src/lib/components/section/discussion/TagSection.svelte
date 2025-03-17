@@ -35,7 +35,7 @@
 							variant={tagIds.includes(tag.id) ? 'default' : 'outline'}
 							size="sm"
 						>
-							#{tag.name}
+							<span class="text-red-600 font-bold">#</span> {tag.name}
 							<span class="font-bold">{tag._count.post}</span>
 						</Button>
 					{/each}

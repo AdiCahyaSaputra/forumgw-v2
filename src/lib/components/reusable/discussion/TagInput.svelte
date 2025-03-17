@@ -62,28 +62,30 @@
 	});
 </script>
 
-<div class="flex flex-col mt-2 gap-2">
-	<div class="max-w-80 flex flex-wrap gap-2">
-		{#each tags as tagName, idx (idx)}
-			<Button
-				variant="outline"
-				onclick={() => {
-					const clonedTags = [...tags];
-					const deletedTagIdx = tags.indexOf(tagName);
+<div class="flex flex-col mt-4 gap-2 border-t-2 border-dashed border-primary pt-4">
+	{#if tags.length > 0}
+		<div class="max-w-80 flex flex-wrap gap-2">
+			{#each tags as tagName, idx (idx)}
+				<Button
+					variant="outline"
+					onclick={() => {
+						const clonedTags = [...tags];
+						const deletedTagIdx = tags.indexOf(tagName);
 
-					clonedTags.splice(deletedTagIdx, 1);
+						clonedTags.splice(deletedTagIdx, 1);
 
-					tags = clonedTags;
-				}}
-        size="sm"
-			>
-				<span>
-					#{tagName}
-				</span>
-				<X />
-			</Button>
-		{/each}
-	</div>
+						tags = clonedTags;
+					}}
+					size="sm"
+				>
+					<span>
+						#{tagName}
+					</span>
+					<X />
+				</Button>
+			{/each}
+		</div>
+	{/if}
 
 	<Popover.Root bind:open>
 		<Popover.Trigger bind:ref={triggerRef}>
@@ -94,7 +96,6 @@
 					{...props}
 					role="combobox"
 					aria-expanded={open}
-					size="sm"
 				>
 					Tags (Optional)
 					<Tags />

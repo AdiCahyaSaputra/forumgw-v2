@@ -1,11 +1,13 @@
-import { t } from '../t';
 import { logger } from '$lib/trpc/middleware/logger';
-import { loginSchema } from '$lib/trpc/schema/loginSchema';
-import { sendTRPCResponse } from '../helper';
+import { authenticated } from '../middleware/authenticated';
+import { getUserForMentioningRequest } from '../schema/userSchema';
+import { getUserForMentioning } from '../services/user';
+import { t } from '../t';
 
 export const user = t.router({
-  login: t.procedure
-    .use(logger)
-    .input(loginSchema())
-    .mutation(({ input, ctx }) => sendTRPCResponse({ status: 200, message: 'ok' }, { input, ctx }))
+	getUserForMentioning: t.procedure
+		.use(logger)
+		.use(authenticated)
+		.input(getUserForMentioningRequest)
+		.query(({ input, ctx }) => getUserForMentioning(input, ctx.user))
 });

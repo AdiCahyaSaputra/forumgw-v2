@@ -1,17 +1,18 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
-	import { MessageSquare } from '@lucide/svelte';
-	import ReportPostDialog from './ReportPostDialog.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { timeAgo } from '$lib/utils';
+	import { MessageSquare } from '@lucide/svelte';
+	import ReportPostDialog from './ReportPostDialog.svelte';
 
 	type Props = {
 		post: {
 			id: string;
 			content: string;
-			cretedAt: Date;
+			createdAt: Date;
 			user: {
 				name: string;
 				username: string;
@@ -34,30 +35,38 @@
 <div class="border-b">
 	<div class="flex items-start gap-2 p-4 pb-2">
 		<Avatar.Root class="rounded-md border m-0">
-			<Avatar.Image src="" alt="@shadcn" />
-			<Avatar.Fallback class="bg-white">A</Avatar.Fallback>
+			<Avatar.Image src={post.user?.image} alt="@shadcn" />
+			<Avatar.Fallback class="bg-white">
+				{#if post.user}
+					{post.user?.username[0].toUpperCase()}
+				{:else}
+					A
+				{/if}
+			</Avatar.Fallback>
 		</Avatar.Root>
 		<div class="flex items-start grow justify-between">
 			<div>
 				{#if post.user}
 					<h3 class="text-sm leading-none font-bold">{post.user.name}</h3>
-					<a href={`/profil/${post.user.username}`} class="text-xs hover:underline">
+					<a href={`/profil/${post.user.username}`} class="text-sm hover:underline">
 						{post.user.username}
 					</a>
 				{:else if post.anonymous}
 					<h3 class="text-sm leading-none font-bold">{post.anonymous.name}</h3>
-					<p class="text-xs hover:underline">{post.anonymous.username}</p>
+					<p class="text-sm">{post.anonymous.username}</p>
 				{/if}
 			</div>
 		</div>
 	</div>
 
 	<div class="px-4 pb-4">
-		<small class="text-foreground/60">{m.post_created_at()} {timeAgo(post.cretedAt)}</small>
+		<small class="text-foreground/60">{m.post_created_at()} {timeAgo(post.createdAt)}</small>
 		{#if post.tags.length > 0}
 			<div class="py-2 flex gap-1">
 				{#each post.tags as tagName, idx (idx)}
-					<Badge variant="outline" class="cursor-pointer hover:bg-slate-100">#{tagName}</Badge>
+					<Badge variant="outline" class="cursor-pointer hover:bg-slate-100">
+						<span class="text-red-600 font-bold">#</span>&nbsp;{tagName}
+					</Badge>
 				{/each}
 			</div>
 		{/if}
@@ -65,7 +74,12 @@
 	</div>
 
 	<div class="px-4 pb-4">
-		<Button variant="outline">
+		<Button
+			onclick={() => {
+				goto(`/discussion/${post.id}`);
+			}}
+			variant="outline"
+		>
 			<MessageSquare />
 			<span>{post._count.comment}</span>
 		</Button>

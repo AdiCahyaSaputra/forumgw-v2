@@ -1,11 +1,7 @@
 <script lang="ts">
-	import * as Form from '$lib/components/ui/form/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { loginSchema, type LoginSchema } from '$lib/trpc/schema/loginSchema.js';
-	import * as m from '$lib/paraglide/messages.js';
-	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { goto } from '$app/navigation';
 	import LangSwitcher from '$lib/components/reusable/global/LangSwitcher.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import {
 		Card,
 		CardContent,
@@ -14,14 +10,18 @@
 		CardHeader,
 		CardTitle
 	} from '$lib/components/ui/card';
-	import { toast } from 'svelte-sonner';
+	import * as Form from '$lib/components/ui/form/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 	import { Separator } from '$lib/components/ui/separator';
-	import { Button } from '$lib/components/ui/button';
-	import { ChevronRight, HandMetal, Loader } from '@lucide/svelte';
-	import { languageTag } from '$lib/paraglide/runtime';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import * as m from '$lib/paraglide/messages.js';
+	import { languageTag } from '$lib/paraglide/runtime';
+	import { loginSchema, type LoginSchema } from '$lib/trpc/schema/loginSchema.js';
+	import { ChevronRight, HandMetal, Loader } from '@lucide/svelte';
 	import type { ActionResult } from '@sveltejs/kit';
-	import { goto } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
+	import { type Infer, superForm, type SuperValidated } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	type Props = {
 		data: {
@@ -32,6 +32,7 @@
 	let { data }: Props = $props();
 
   let loginLoading = $state(false);
+	let formResult: ActionResult | null = $state(null);
 
 	let form = superForm(data.form, {
 		validators: zodClient(loginSchema()),
@@ -60,8 +61,6 @@
 	});
 
 	const { form: formData, enhance } = form;
-
-	let formResult: ActionResult | null = $state(null);
 </script>
 
 <svelte:head>

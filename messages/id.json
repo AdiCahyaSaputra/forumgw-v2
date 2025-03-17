@@ -56,5 +56,12 @@
   "second": "detik",
   "just_now": "baru tadi",
   "time_plural": "",
-  "ago": "lalu"
+  "ago": "lalu",
+  "post_detail_page_title": "Detil Diskusi",
+  "comment_placeholder": "Komentarmu...",
+  "empty": "Nggak ketemu",
+  "comment_create_group_unauthorized_error": "Kamu bukan member dari group ini",
+  "comment_created_at": "Dikomentari",
+  "reply_comment": "Balsesan Komentar",
+  "reply_comment_placeholder": "Bales Komentar..."
 }

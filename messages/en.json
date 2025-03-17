@@ -56,5 +56,12 @@
   "second": "second",
   "just_now": "just now",
   "time_plural": "s",
-  "ago": "ago"
+  "ago": "ago",
+  "post_detail_page_title": "Detail Discussion",
+  "comment_placeholder": "Your Comment...",
+  "empty": "Can't find it",
+  "comment_create_group_unauthorized_error": "You are not the member of this group",
+  "comment_created_at": "Commented",
+  "reply_comment": "Reply Comments",
+  "reply_comment_placeholder": "Reply Comment..."
 }
