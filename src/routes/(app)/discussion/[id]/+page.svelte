@@ -65,11 +65,9 @@
           {comment} 
 
           formEditComment={data.formEditComment} 
-          formDeleteComment={data.formDeleteComment} 
 
           formReplyComment={data.formReplyComment} 
           formEditReplyComment={data.formEditReplyComment} 
-          formDeleteReplyComment={data.formDeleteReplyComment} 
         />
 			{/each}
 

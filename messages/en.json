@@ -67,5 +67,10 @@
   "edit_comment_dialog_title": "Edit Comment",
   "edit_comment_dialog_description": "In case there is a typo",
   "edit_comment_submit": "Edit Comment",
-  "edit_comment_drawer_close": "Cancel"
+  "edit_comment_drawer_close": "Cancel",
+
+  "delete_comment_dialog_title": "Delete Comment",
+  "delete_comment_dialog_description": "Don't let people judge you, delete your comments!",
+  "delete_comment_submit": "Delete Comment",
+  "delete_comment_drawer_close": "Cancel"
 }

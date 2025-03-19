@@ -1,5 +1,10 @@
-import { commentRequest, deleteCommentRequest, deleteReplyCommentRequest, replyCommentRequest } from '$lib/trpc/schema/commentSchema';
-import { createComment, deleteComment, deleteReplyComment, editComment, editReplyComment, replyComment } from '$lib/trpc/services/comment';
+import { commentRequest, replyCommentRequest } from '$lib/trpc/schema/commentSchema';
+import {
+  createComment,
+  editComment,
+  editReplyComment,
+  replyComment
+} from '$lib/trpc/services/comment';
 import { verifyUserToken } from '$lib/trpc/services/user';
 import { fail, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -9,11 +14,9 @@ export const load: PageServerLoad = async (event) => {
   return {
     formComment: await superValidate(zod(commentRequest())),
     formEditComment: await superValidate(zod(commentRequest())),
-    formDeleteComment: await superValidate(zod(deleteCommentRequest)),
 
     formReplyComment: await superValidate(zod(replyCommentRequest())),
     formEditReplyComment: await superValidate(zod(replyCommentRequest())),
-    formDeleteReplyComment: await superValidate(zod(deleteReplyCommentRequest)),
 
     params: event.params,
     user: (await event.parent()).user
@@ -76,7 +79,7 @@ export const actions: Actions = {
 
     const { user } = await verifyUserToken(event);
 
-    if(!user) {
+    if (!user) {
       return fail(401, {
         form,
         message: 'Unauthorized'
@@ -96,44 +99,8 @@ export const actions: Actions = {
 
     return {
       form
-    }
+    };
   },
-  deleteComment: async (event) => {
-    const form = await superValidate(event, zod(deleteCommentRequest));
-
-    if (!form.valid) {
-      console.log(form.errors);
-
-      return fail(400, {
-        form
-      });
-    }
-
-    const { user } = await verifyUserToken(event);
-
-    if(!user) {
-      return fail(401, {
-        form,
-        message: 'Unauthorized'
-      });
-    }
-
-    const response = await deleteComment(form.data, user);
-
-    if (response.status !== 200) {
-      const { status, message } = response;
-
-      return fail(status, {
-        form,
-        message
-      });
-    }
-
-    return {
-      form
-    }
-  },
-
   replyComment: async (event) => {
     const form = await superValidate(event, zod(replyCommentRequest()));
 
@@ -180,7 +147,7 @@ export const actions: Actions = {
       });
     }
 
-    if(!form.data.replyCommentId) {
+    if (!form.data.replyCommentId) {
       return fail(404, {
         form,
         message: 'Not Found'
@@ -210,40 +177,5 @@ export const actions: Actions = {
     return {
       form
     };
-  },
-  deleteReplyComment: async (event) => {
-    const form = await superValidate(event, zod(deleteReplyCommentRequest));
-
-    if (!form.valid) {
-      console.log(form.errors);
-
-      return fail(400, {
-        form
-      });
-    }
-
-    const { user } = await verifyUserToken(event);
-
-    if (!user) {
-      return fail(401, {
-        form,
-        message: 'Unauthorized'
-      });
-    }
-
-    const response = await deleteReplyComment(form.data, user);
-
-    if (response.status !== 200) {
-      const { status, message } = response;
-
-      return fail(status, {
-        form,
-        message
-      });
-    }
-
-    return {
-      form
-    };
-  },
+  }
 };

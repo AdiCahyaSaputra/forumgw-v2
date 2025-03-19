@@ -116,6 +116,7 @@ export const getReplyComments = async (input: z.infer<typeof getReplyCommentsReq
     .select({
       id: replyComments.id,
       text: replyComments.text,
+      commentId: replyComments.commentId,
       user: {
         name: users.name,
         username: users.username,

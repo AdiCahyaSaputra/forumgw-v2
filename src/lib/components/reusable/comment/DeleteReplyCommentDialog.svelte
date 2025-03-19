@@ -7,14 +7,14 @@
 	import { toast } from 'svelte-sonner';
 
 	let { 
-    commentId,
+    replyCommentId,
     open = $bindable(false)
   } = $props();
 
-	const deleteComment = trpc().comment.deleteComment.createMutation({
+	const deleteReplyComment = trpc().comment.deleteReplyComment.createMutation({
 		onSuccess: () => {
 			trpcClientUtils($page).comment.getPostComments.invalidate();
-			trpcClientUtils($page).post.getPostDetail.invalidate();
+			trpcClientUtils($page).comment.getReplyComments.invalidate();
 		},
 		onError: () => {
 			toast.error(m.global_error_message());
@@ -29,9 +29,9 @@
 	submit={m.delete_comment_submit()}
 	cancel={m.delete_comment_drawer_close()}
 	onSubmit={() => {
-		$deleteComment.mutate({
-			commentId
+		$deleteReplyComment.mutate({
+      replyCommentId
 		});
 	}}
-  isPending={$deleteComment.isPending}
+  isPending={$deleteReplyComment.isPending}
 />

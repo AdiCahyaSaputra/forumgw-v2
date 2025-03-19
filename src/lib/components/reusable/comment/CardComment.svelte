@@ -14,6 +14,7 @@
 	import CreateReplyCommentForm from './CreateReplyCommentForm.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import EditCommentDialog from './EditCommentDialog.svelte';
+	import DeleteCommentDialog from './DeleteCommentDialog.svelte';
 
 	type Props = {
 		comment: {
@@ -31,26 +32,22 @@
 			};
 		};
 		formEditComment: SuperValidated<Infer<ReturnType<typeof commentRequest>>>;
-		formDeleteComment: SuperValidated<Infer<typeof deleteCommentRequest>>;
 
 		formReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
 		formEditReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
-		formDeleteReplyComment: SuperValidated<Infer<typeof deleteReplyCommentRequest>>;
 	};
 
-	const { 
-    comment, 
+	const {
+		comment,
 		formEditComment,
-		formDeleteComment,
 
 		formReplyComment,
-		formEditReplyComment,
-		formDeleteReplyComment,
-  }: Props = $props();
+		formEditReplyComment
+	}: Props = $props();
 
 	let openReplyComment = $state(false);
-	let repliesCount = $state(comment._count.replies);
 	let openEditComment = $state(false);
+	let openDeleteComment = $state(false);
 </script>
 
 <div class={['rounded-md border', openReplyComment && 'border-primary']}>
@@ -81,8 +78,10 @@
 			{formEditComment}
 			postId={comment.postId}
 			commentId={comment.id}
-      text={comment.text}
+			text={comment.text}
 		/>
+
+		<DeleteCommentDialog commentId={comment.id} bind:open={openDeleteComment} />
 
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
@@ -99,6 +98,7 @@
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
 						class="data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive cursor-pointer"
+            onclick={() => openDeleteComment = true}
 					>
 						<Trash2 /> Delete
 					</DropdownMenu.Item>
@@ -122,7 +122,7 @@
 			variant="outline"
 		>
 			<span class="text-sm text-foreground/60">
-				<span class="font-bold">{repliesCount}</span>&nbsp;{m.reply_comment()}
+				<span class="font-bold">{comment._count.replies}</span>&nbsp;{m.reply_comment()}
 			</span>
 			{#if openReplyComment}
 				<ChevronDown />
@@ -134,8 +134,9 @@
 	<CreateReplyCommentForm
 		{openReplyComment}
 		{formReplyComment}
+    {formEditReplyComment}
 		defaultCommentText=""
 		commentId={comment.id}
-		bind:repliesCount
+		repliesCount={comment._count.replies}
 	/>
 </div>

@@ -6,7 +6,7 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { toast } from 'svelte-sonner';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { commentRequest } from '$lib/trpc/schema/commentSchema';
+	import { replyCommentRequest } from '$lib/trpc/schema/commentSchema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { trpcClientUtils } from '$lib/utils';
 	import { page } from '$app/stores';
@@ -15,30 +15,36 @@
 	import CommentInput from './CommentInput.svelte';
 
 	type Props = {
-		openEditComment: boolean;
-		formEditComment: SuperValidated<Infer<ReturnType<typeof commentRequest>>>;
+		open: boolean;
+		formEditReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
 		text: string;
-		postId: string;
 		commentId: number;
+		replyCommentId: number;
 	};
 
-	let { openEditComment = $bindable(false), formEditComment, postId, commentId, text }: Props = $props();
+	let { 
+    open = $bindable(false), 
+    formEditReplyComment, 
+    commentId, 
+    replyCommentId, 
+    text 
+  }: Props = $props();
 
-	let editCommentLoading = $state(false);
+	let editReplyLoading = $state(false);
 	let formResult: ActionResult | null = $state(null);
 	let mentionedUserIds: string[] = $state([]);
 
-	let form = superForm(formEditComment, {
-		validators: zodClient(commentRequest()),
+	let form = superForm(formEditReplyComment.data, {
+		validators: zodClient(replyCommentRequest()),
 		onSubmit: ({ formData }) => {
-			editCommentLoading = true;
+			editReplyLoading = true;
 
 			formData.append('mentionUsers', mentionedUserIds.join(','));
 		},
 		onResult: async ({ result }) => {
 			formResult = result;
 
-			editCommentLoading = false;
+			editReplyLoading = false;
 		},
 		onUpdate: async ({ result }) => {
 			switch (result.type) {
@@ -46,9 +52,9 @@
 					toast.error(result.data?.message || m.global_error_message());
 					break;
 				case 'success':
-					trpcClientUtils($page).comment.getPostComments.invalidate();
+					trpcClientUtils($page).comment.getReplyComments.invalidate();
 
-					openEditComment = false;
+					open = false;
 					break;
 				default:
 					toast.error(m.global_error_message());
@@ -71,12 +77,12 @@
 </script>
 
 <ResponsiveDialog
-	bind:open={openEditComment}
+	bind:open={open}
 	title={m.edit_comment_dialog_title()}
 	description={m.edit_comment_dialog_description()}
 	drawerClose={m.edit_comment_drawer_close()}
 >
-	<form method="POST" action="?/editComment" use:enhance>
+	<form method="POST" action="?/editReplyComment" use:enhance>
 		<Form.Field {form} name="text">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -93,15 +99,6 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<Form.Field {form} name="postId" class="p-0 m-0">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Input {...props} value={postId} class="hidden" />
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-
 		<Form.Field {form} name="commentId" class="p-0 m-0">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -111,7 +108,16 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<Button disabled={editCommentLoading} type="submit" class="mt-4 w-full">
+		<Form.Field {form} name="replyCommentId" class="p-0 m-0">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Input {...props} value={replyCommentId} class="hidden" />
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+
+		<Button disabled={editReplyLoading} type="submit" class="mt-4 w-full">
 			{m.edit_comment_submit()}
 		</Button>
 	</form>

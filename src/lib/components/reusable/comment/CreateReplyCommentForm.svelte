@@ -22,6 +22,7 @@
 	type Props = {
 		openReplyComment: boolean;
 		formReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
+		formEditReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
 		defaultCommentText: string;
 		commentId: number;
 		repliesCount: number;
@@ -30,6 +31,7 @@
 	let {
 		openReplyComment,
 		formReplyComment,
+		formEditReplyComment,
 		defaultCommentText,
 		commentId,
 		repliesCount = $bindable()
@@ -61,14 +63,12 @@
 			loadingReplyComment = false;
 			$formData.text = '';
 
-			trpcClientUtils($page).comment.getReplyComments.invalidate();
 			trpcClientUtils($page).comment.getPostComments.invalidate();
+      $replies.refetch();
 		},
 		onUpdate: async ({ result }) => {
 			if (result.type !== 'success') {
 				toast.error(result.data?.message || m.global_error_message());
-			} else {
-				repliesCount = repliesCount + 1;
 			}
 		},
 		resetForm: true
@@ -99,7 +99,7 @@
 			{#if $replies.data}
 				<div class="max-h-40 overflow-y-scroll">
 					{#each $replies.data.pages.flatMap((page) => page.data.replies) as replyComment, idx (idx)}
-						<CardReplyComment {replyComment} />
+						<CardReplyComment {replyComment} {formEditReplyComment} />
 					{/each}
 
 					{#if $replies.data.pages.at(-1)?.data.hasNextPage}

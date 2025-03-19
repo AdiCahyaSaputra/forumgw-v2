@@ -4,7 +4,6 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { trpc } from '$lib/trpc/client';
-	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import LoadingState from '../global/LoadingState.svelte';
 
@@ -24,7 +23,7 @@
 
 	let showUserOptions = $state(false);
 	let inputRef: HTMLElement | null = $state(null);
-	let inputCommentText = $state('');
+	let inputCommentText = $state(defaultValue);
 
 	const users = trpc($page).user.getUserForMentioning.createQuery(mentionUserFilter, {
 		enabled: () => showUserOptions // should use closure to get updated state change
@@ -55,7 +54,7 @@
 		const commentTextCompletion = splittedCommentTextInput.slice(0, -1);
 		const lastMentionedUserId = mentionedUserIds.at(-1) as string;
 
-		commentTextCompletion.push(`@${user.username}`);
+		commentTextCompletion.push(`@${user.username} `);
 		value = commentTextCompletion.join(' ');
 		inputCommentText = commentTextCompletion.join(' ');
 
@@ -98,19 +97,11 @@
 	});
 
 	$effect(() => {
-		if (formResultType !== null && formResultType === 'success') {
-      console.log("reset ke trigger");
-      
+		if (formResultType && formResultType === 'success') {
 			inputCommentText = '';
 			value = '';
 		}
 	});
-
-  onMount(() => {
-    if(defaultValue !== '') {
-      inputCommentText = defaultValue;
-    }
-  });
 </script>
 
 <div class="relative">
