@@ -63,5 +63,9 @@
   "comment_create_group_unauthorized_error": "You are not the member of this group",
   "comment_created_at": "Commented",
   "reply_comment": "Reply Comments",
-  "reply_comment_placeholder": "Reply Comment..."
+  "reply_comment_placeholder": "Reply Comment...",
+  "edit_comment_dialog_title": "Edit Comment",
+  "edit_comment_dialog_description": "In case there is a typo",
+  "edit_comment_submit": "Edit Comment",
+  "edit_comment_drawer_close": "Cancel"
 }

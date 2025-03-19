@@ -23,6 +23,12 @@
 	const comments = trpc($page).comment.getPostComments.createInfiniteQuery(commentsFilter, {
 		getNextPageParam: (lastPage) => lastPage.data.nextCursor
 	});
+
+	$effect(() => {
+		if(isIntersecting) {
+			$comments.fetchNextPage();
+		}
+	})
 </script>
 
 <svelte:head>
@@ -55,7 +61,16 @@
 	{#if $comments.data}
 		<div class="p-4 flex flex-col space-y-4">
 			{#each $comments.data.pages.flatMap((page) => page.data.comments) as comment (comment.id)}
-				<CardComment {comment} formReplyComment={data.formReplyComment} />
+				<CardComment 
+          {comment} 
+
+          formEditComment={data.formEditComment} 
+          formDeleteComment={data.formDeleteComment} 
+
+          formReplyComment={data.formReplyComment} 
+          formEditReplyComment={data.formEditReplyComment} 
+          formDeleteReplyComment={data.formDeleteReplyComment} 
+        />
 			{/each}
 
 			{#if $comments.data.pages.at(-1)?.data.hasNextPage}

@@ -63,5 +63,9 @@
   "comment_create_group_unauthorized_error": "Kamu bukan member dari group ini",
   "comment_created_at": "Dikomentari",
   "reply_comment": "Balsesan Komentar",
-  "reply_comment_placeholder": "Bales Komentar..."
+  "reply_comment_placeholder": "Bales Komentar...",
+  "edit_comment_dialog_title": "Edit Komentar",
+  "edit_comment_dialog_description": "Siapa tau ada yang typo yakan",
+  "edit_comment_submit": "Edit Keun",
+  "edit_comment_drawer_close": "Ga Jadi"
 }

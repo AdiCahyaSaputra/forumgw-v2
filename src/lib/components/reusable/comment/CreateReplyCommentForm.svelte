@@ -24,7 +24,7 @@
 		formReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
 		defaultCommentText: string;
 		commentId: number;
-    repliesCount: number;
+		repliesCount: number;
 	};
 
 	let {
@@ -59,24 +59,31 @@
 		onResult: async ({ result }) => {
 			formResult = result;
 			loadingReplyComment = false;
-      $formData.text = '';
+			$formData.text = '';
 
 			trpcClientUtils($page).comment.getReplyComments.invalidate();
+			trpcClientUtils($page).comment.getPostComments.invalidate();
 		},
 		onUpdate: async ({ result }) => {
 			if (result.type !== 'success') {
 				toast.error(result.data?.message || m.global_error_message());
 			} else {
-        repliesCount = repliesCount + 1;
-      }
+				repliesCount = repliesCount + 1;
+			}
 		},
-    resetForm: true
+		resetForm: true
 	});
 
 	const { form: formData, enhance } = form;
 
 	onMount(() => {
 		$formData.text = defaultCommentText;
+	});
+
+	$effect(() => {
+		if (isIntersecting) {
+			$replies.fetchNextPage();
+		}
 	});
 </script>
 
@@ -118,6 +125,7 @@
 								bind:mentionedUserIds
 								{...props}
 								placeholder={m.reply_comment_placeholder()}
+								formResultType={formResult?.type}
 							/>
 						{/snippet}
 					</Form.Control>
