@@ -22,6 +22,8 @@
 	import type { ActionResult } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+  import { trpc } from '$lib/trpc/client';
 
 	type Props = {
 		data: {
@@ -31,37 +33,29 @@
 
 	let { data }: Props = $props();
 
-	let registerLoading = $state(false);
+	let disabledForRedirect = $state(false);
 
-	const form = superForm(data.form, {
-		validators: zodClient(registerSchema()),
-		onSubmit: () => {
-			registerLoading = true;
+	let registerMutate = trpc($page).user.register.createMutation({
+		onSuccess: async () => {
+			disabledForRedirect = true;
+
+			await goto('/login', { replaceState: true });
 		},
-		onResult: async ({ result }) => {
-			formResult = result;
-			registerLoading = false;
-		},
-		onUpdate: async ({ result }) => {
-			switch (result.type) {
-				case 'failure':
-					toast.error(result.data?.message || m.global_error_message());
-					break;
-				case 'success':
-					await goto('/login', { replaceState: true });
-					break;
-				default:
-					toast.error(m.global_error_message());
-			}
-		},
-		onError: () => {
+		onError: (error) => {
 			toast.error(m.global_error_message());
 		}
 	});
 
-	const { form: formData, enhance, submitting } = form;
+	const form = superForm(data.form, {
+		validators: zodClient(registerSchema()),
+		onSubmit: ({ formData }) => {
+			const data = Object.fromEntries(formData) as z.infer<RegisterSchema>;
 
-	let formResult: ActionResult | null = $state(null);
+			$registerMutate.mutate(data);
+		}
+	});
+
+	const { form: formData, enhance } = form;
 </script>
 
 <svelte:head>
@@ -148,17 +142,17 @@
 						<Form.FieldErrors />
 					</Form.Field>
 					<Form.Button
-						disabled={registerLoading || formResult?.type === 'success'}
+						disabled={$registerMutate.isPending || disabledForRedirect}
 						class="mt-4 w-full font-bold flex justify-between items-center"
 					>
 						<span>
-							{#if formResult?.type === 'success'}
+							{#if disabledForRedirect}
 								{m.register_button_success()}
 							{:else}
 								{m.register_button()}
 							{/if}
 						</span>
-						{#if registerLoading || formResult?.type === 'success'}
+						{#if $registerMutate.isPending || disabledForRedirect}
 							<Loader class="animate-spin" />
 						{:else}
 							<ChevronRight />

@@ -18,10 +18,12 @@
 	import { languageTag } from '$lib/paraglide/runtime';
 	import { loginSchema, type LoginSchema } from '$lib/trpc/schema/loginSchema.js';
 	import { ChevronRight, HandMetal, Loader } from '@lucide/svelte';
-	import type { ActionResult } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
 	import { type Infer, superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { page } from '$app/stores';
+	import { trpc } from '$lib/trpc/client';
+	import { z } from 'zod';
 
 	type Props = {
 		data: {
@@ -31,32 +33,36 @@
 
 	let { data }: Props = $props();
 
-  let loginLoading = $state(false);
-	let formResult: ActionResult | null = $state(null);
+  let disabledForRedirect = $state(false);
 
-	let form = superForm(data.form, {
-		validators: zodClient(loginSchema()),
-    onSubmit: () => {
-      loginLoading = true;
-    },
-		onResult: async ({ result }) => {
-			formResult = result;
-      loginLoading = false;
-		},
-		onUpdate: async ({ result }) => {
-			switch (result.type) {
-				case 'failure':
-					toast.error(result.data?.message || m.global_error_message());
-					break;
-				case 'success':
-					await goto('/discussion', { replaceState: true });
-					break;
-				default:
-					toast.error(m.global_error_message());
-			}
+	let loginMutate = trpc($page).user.login.createMutation({
+		onSuccess: async (data) => {
+      if(data.status !== 200) {
+        toast.error(data.message || m.global_error_message());
+
+        return;
+      }
+
+      disabledForRedirect = true;
+
+			await goto('/discussion', { replaceState: true });
 		},
 		onError: () => {
 			toast.error(m.global_error_message());
+		},
+		onSettled: () => {
+			$loginMutate.reset();
+		}
+	});
+
+	let form = superForm(data.form, {
+		validators: zodClient(loginSchema()),
+		onSubmit: ({ formData }) => {
+			const data = Object.fromEntries(formData) as z.infer<LoginSchema>;
+
+			$loginMutate.mutate(data);
+
+      return false;
 		}
 	});
 
@@ -133,17 +139,17 @@
 						<Form.FieldErrors />
 					</Form.Field>
 					<Form.Button
-						disabled={loginLoading || formResult?.type === 'success'}
+						disabled={$loginMutate.isPending || disabledForRedirect}
 						class="mt-4 w-full font-bold flex justify-between items-center"
 					>
 						<span>
-							{#if formResult?.type === 'success'}
+							{#if disabledForRedirect}
 								{m.login_button_success()}
 							{:else}
 								{m.login_button()}
 							{/if}
 						</span>
-						{#if loginLoading || formResult?.type === 'success'}
+						{#if $loginMutate.isPending || disabledForRedirect}
 							<Loader class="animate-spin" />
 						{:else}
 							<ChevronRight />
