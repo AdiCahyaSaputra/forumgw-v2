@@ -13,7 +13,7 @@ export const getPostDetailRequest = z.object({
 
 export const createPostRequest = () =>
 	z.object({
-		tags: z.string().default(''),
+		tags: z.array(z.string()).default([]),
 		isAnonymous: z.boolean().default(false),
 		content: z
 			.string()

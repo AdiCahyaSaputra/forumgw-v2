@@ -13,6 +13,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import TagInput from './TagInput.svelte';
+	import { trpc } from '$lib/trpc/client';
 
 	type Props = {
 		formCreate: SuperValidated<Infer<ReturnType<typeof createPostRequest>>>;
@@ -20,43 +21,46 @@
 
 	let { formCreate }: Props = $props();
 
-	let createPostLoading = $state(false);
 	let open = $state(false);
 	let tags = $state<string[]>([]);
+
+	let postMutate = trpc($page).post.createPost.createMutation({
+		onSuccess: (data) => {
+			if (data.status !== 201) {
+				toast.error(data.message || m.global_error_message());
+
+				return;
+			}
+
+			trpcClientUtils($page).post.getPublicPostDiscussions.invalidate();
+			trpcClientUtils($page).tag.getAllTags.invalidate();
+
+			open = false;
+			toast.success(data.message);
+		},
+		onError: () => {
+			toast.error(m.global_error_message());
+		},
+		onSettled: () => {
+			$postMutate.reset();
+      reset();
+		}
+	});
 
 	let form = superForm(formCreate, {
 		validators: zodClient(createPostRequest()),
 		onSubmit: ({ formData }) => {
-			createPostLoading = true;
+			const data = Object.fromEntries(formData) as z.infer<ReturnType<typeof createPostRequest>>;
 
-			formData.set('tags', tags.join(','));
-		},
-		onResult: async () => {
-			createPostLoading = false;
-		},
-		onUpdate: async ({ result }) => {
-			switch (result.type) {
-				case 'failure':
-					toast.error(result.data?.message || m.global_error_message());
-					break;
-				case 'success':
-					trpcClientUtils($page).post.getPublicPostDiscussions.invalidate();
-					trpcClientUtils($page).tag.getAllTags.invalidate();
-
-					toast.success(result.data.message);
-
-					open = false;
-					break;
-				default:
-					toast.error(m.global_error_message());
-			}
-		},
-		onError: () => {
-			toast.error(m.global_error_message());
+			$postMutate.mutate({
+				...data,
+				tags,
+        isAnonymous: data.isAnonymous === 'on'
+			});
 		}
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, reset } = form;
 </script>
 
 <ResponsiveDialog
@@ -65,7 +69,7 @@
 	description={m.post_form_message()}
 	drawerClose={m.post_create_button_cancel()}
 >
-	<form method="POST" action="?/createNewPost" use:enhance>
+	<form method="POST" use:enhance>
 		<Button
 			variant={$formData.isAnonymous ? 'destructive' : 'outline'}
 			class="justify-between items-center w-full"
@@ -105,7 +109,7 @@
 
 		<TagInput bind:tags />
 
-		<Button disabled={createPostLoading} type="submit" class="w-full mt-20">
+		<Button disabled={$postMutate.isPending} type="submit" class="w-full mt-20">
 			{m.post_create_button_submit()}
 		</Button>
 	</form>

@@ -2,15 +2,32 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Siren } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages.js';
-	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import type { posts } from '$lib/server/db/schema';
 	import ResponsiveDialog from '$lib/components/reusable/global/ResponsiveDialog.svelte';
+	import { page } from '$app/stores';
+	import { trpc } from '$lib/trpc/client';
 
 	const { id }: { id: (typeof posts.$inferSelect)['id'] } = $props();
 
 	let open = $state(false);
+
+	let reportPost = trpc($page).post.reportPost.createMutation({
+		onSuccess: (data) => {
+			if (data.status !== 200) {
+				toast.error(data.message || m.global_error_message());
+
+				return;
+			}
+
+      open = false;
+			toast.success(data.message);
+		},
+		onError: () => {
+			toast.error(m.global_error_message());
+		}
+	});
 </script>
 
 <ResponsiveDialog
@@ -20,21 +37,11 @@
 	drawerClose={m.post_report_button_cancel()}
 >
 	<form
-		method="POST"
-		action="?/reportPost"
-		use:enhance={() =>
-			async ({ result }) => {
-				switch (result.type) {
-					case 'failure':
-						toast.error(result.data?.message || m.global_error_message());
-						break;
-					case 'success':
-						toast.success(result.data?.message || 'ok');
-						break;
-					default:
-						toast.error(m.global_error_message());
-				}
-			}}
+		onsubmit={(e) => {
+			e.preventDefault();
+
+			$reportPost.mutate({ id, reason: e.currentTarget.reason.value });
+		}}
 	>
 		<input type="text" class="hidden" name="id" value={id} />
 		<Input
@@ -45,10 +52,10 @@
 			class="w-full"
 		/>
 
-		<Button type="submit" class="mt-4 w-full">{m.post_report_button_submit()}</Button>
+		<Button type="submit" disabled={$reportPost.isPending} class="mt-4 w-full">{m.post_report_button_submit()}</Button>
 	</form>
 </ResponsiveDialog>
 
-<Button variant="destructive" onclick={() => open = true}>
+<Button variant="destructive" onclick={() => (open = true)}>
 	<Siren />
 </Button>

@@ -185,8 +185,7 @@ export const createNewPost = async (
   input: z.infer<ReturnType<typeof createPostRequest>>,
   userId: (typeof users.$inferSelect)['id']
 ) => {
-  const { isAnonymous, content, tags: tagsString } = input;
-  const tagsName = tagsString.split(',');
+  const { isAnonymous, content, tags: tagsName } = input;
 
   try {
     const trpcResponse = await db.transaction(async (tx) => {
@@ -270,18 +269,18 @@ export const reportPost = async (input: z.infer<typeof reportPostRequest>) => {
     .insert(reports)
     .values({
       postId: input.id,
-      reason: input.reason
+      reason: input.reason || '-'
     })
     .then(() =>
       sendTRPCResponse({
-        status: 201,
+        status: 200,
         message: m.post_report_success()
       })
     )
     .catch(() =>
       sendTRPCResponse({
         status: 500,
-        message: 'error'
+        message: m.global_error_message()
       })
     );
 
