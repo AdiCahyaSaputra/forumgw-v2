@@ -10,6 +10,7 @@
 	import { writable } from 'svelte/store';
 	import { z } from 'zod';
 	import type { PageProps } from './$types';
+  import type { SelectedTag } from '$lib/constant';
 
 	type PostsInput = z.infer<ReturnType<typeof getPublicPostDiscussionsRequest>>;
 
@@ -21,6 +22,7 @@
 
 	let triggerMorePostsElement: HTMLElement | null = $state(null);
 	let isIntersecting = $state(false);
+  let selectedTags = $state<SelectedTag[]>([]);
 
 	const posts = trpc($page).post.getPublicPostDiscussions.createInfiniteQuery(postsInput, {
 		getNextPageParam: (lastPage) => lastPage.data.nextCursor
@@ -39,22 +41,26 @@
 </svelte:head>
 
 <TagSection
-	onTagSelected={(tagId) => {
+	onTagSelected={(tag: SelectedTag) => {
 		const clonedTagIds = [...$postsInput.tagIds];
-		const existTagIdIdx = clonedTagIds.indexOf(tagId);
+    const clonedSelectedTags = [...selectedTags];
+		const existTagIdIdx = clonedTagIds.indexOf(tag.id);
 
 		if (existTagIdIdx !== -1) {
 			clonedTagIds.splice(existTagIdIdx, 1);
+      clonedSelectedTags.splice(existTagIdIdx, 1);
 		} else {
-			clonedTagIds.push(tagId);
+			clonedTagIds.push(tag.id);
+      clonedSelectedTags.push(tag);
 		}
 
 		$postsInput = { tagIds: clonedTagIds };
+    selectedTags = clonedSelectedTags;
 	}}
-	tagIds={$postsInput.tagIds}
 	clearFilter={() => {
 		$postsInput = { tagIds: [] };
 	}}
+  {selectedTags}
 />
 
 <div class="lg:hidden block p-4 border-b">

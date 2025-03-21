@@ -16,6 +16,8 @@ export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>) => {
 		condition.push(like(tags.name, `%${input.name}%`));
 	}
 
+  const limit = 10;
+
 	const allTags = await db
 		.select({
 			id: tags.id,
@@ -29,7 +31,11 @@ export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>) => {
 		.where(and(...condition))
 		.groupBy(tags.id)
 		.orderBy(sql`post_count DESC`)
-		.limit(10);
+		.limit(limit + 1);
+
+  const hasNextPage = allTags.length > limit;
+  const paginatedResults = allTags.slice(0, limit);
+  const nextCursor = hasNextPage ? paginatedResults[limit - 1].id : null;
 
 	return sendTRPCResponse(
 		{
@@ -38,7 +44,8 @@ export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>) => {
 		},
 		{
 			tags: allTags,
-			nextCursor: allTags.length > 0 ? allTags.at(-1)?.id : null
+			nextCursor,
+      hasNextPage
 		}
 	);
 };

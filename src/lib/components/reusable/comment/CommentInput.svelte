@@ -13,7 +13,7 @@
 		placeholder = m.comment_placeholder(),
 		groupId = null,
 		formResultType = null,
-    defaultValue = '',
+		defaultValue = '',
 		...props
 	} = $props();
 
@@ -32,16 +32,22 @@
 	const commentChangeHandler = (commentText: string) => {
 		value = commentText;
 
-		if (commentText.includes('@')) {
-			const splittedCommentTextInput = commentText.split(' ');
-			const lastInputText = splittedCommentTextInput.at(-1) as string; // the index arg of .at() might "out of bound" so it possibly undefined
+		const timeout = setTimeout(() => {
+			if (commentText.includes('@')) {
+				const splittedCommentTextInput = commentText.split(' ');
+				const lastInputText = splittedCommentTextInput.at(-1) as string; // the index arg of .at() might "out of bound" so it possibly undefined
 
-			showUserOptions = lastInputText.startsWith('@');
-			$mentionUserFilter.username = lastInputText.startsWith('@') ? lastInputText : '';
-		} else {
-			showUserOptions = false;
-			$mentionUserFilter.username = '';
-		}
+				showUserOptions = lastInputText.startsWith('@');
+				$mentionUserFilter.username = lastInputText.startsWith('@') ? lastInputText : '';
+			} else {
+				showUserOptions = false;
+				$mentionUserFilter.username = '';
+			}
+		}, 500);
+
+		return () => {
+			clearTimeout(timeout);
+		};
 	};
 
 	const mentionUserHandler = (user: {
@@ -73,27 +79,7 @@
 	};
 
 	$effect(() => {
-		console.log(inputCommentText); // For triggering this effect
-
-		const timeout = setTimeout(() => {
-			commentChangeHandler(inputCommentText);
-		}, 500);
-
-		return () => clearTimeout(timeout);
-	});
-
-	$effect(() => {
-		const handleEscKey = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
-				showUserOptions = false;
-			}
-		};
-
-		document.addEventListener('keydown', handleEscKey);
-
-		return () => {
-			document.removeEventListener('keydown', handleEscKey);
-		};
+		commentChangeHandler(inputCommentText);
 	});
 
 	$effect(() => {
@@ -103,6 +89,8 @@
 		}
 	});
 </script>
+
+<svelte:document onkeydown={(e) => e.key === 'Escape' && (showUserOptions = false)} />
 
 <div class="relative">
 	<Input

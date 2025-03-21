@@ -4,17 +4,32 @@
 	import { Button } from '$lib/components/ui/button';
 	import { trpc } from '$lib/trpc/client';
 	import { Eraser, Search } from '@lucide/svelte';
+	import TagFilter from '$lib/components/reusable/discussion/TagFilter.svelte';
+	import type { SelectedTag } from '$lib/constant';
+	import IntersectionObserver from 'svelte-intersection-observer';
 
-  type Props = {
-    onTagSelected: (tagId: number) => void; 
-    tagIds: number[]; 
-    clearFilter: () => void;
-  }
+	type Props = {
+		onTagSelected: (tag: SelectedTag) => void;
+		tagIds: number[];
+		clearFilter: () => void;
+		selectedTags: SelectedTag[];
+	};
 
-	const tags = trpc($page).tag.getAllTags.createQuery({});
+	const tags = trpc($page).tag.getAllTags.createInfiniteQuery(
+		{},
+		{
+			getNextPageParam: (lastPage) => lastPage.data.nextCursor
+		}
+	);
 
-	let { onTagSelected: selectTag, tagIds, clearFilter }: Props = $props();
+	let { onTagSelected: selectTag, selectedTags, clearFilter }: Props = $props();
+
+	let openFilter = $state(false);
+	let triggerMoreTagsElement: HTMLElement | null = $state(null);
+	let isIntersecting = $state(false);
 </script>
+
+<TagFilter bind:open={openFilter} {selectTag} />
 
 <div class="border-b sticky top-0 z-10 bg-white">
 	<div class="relative h-full p-8">
@@ -27,18 +42,40 @@
 				{/snippet}
 
 				{#if $tags.data}
-					{#each $tags.data.data.tags as tag, idx (idx)}
+					{#each selectedTags as tag, idx (idx)}
 						<Button
 							onclick={() => {
-								selectTag(tag.id);
+								selectTag(tag);
 							}}
-							variant={tagIds.includes(tag.id) ? 'default' : 'outline'}
+							variant="default"
 							size="sm"
 						>
-							<span class="text-red-600 font-bold">#</span> {tag.name}
+							<span class="text-red-600 font-bold">#</span>
+							{tag.name}
 							<span class="font-bold">{tag._count.post}</span>
 						</Button>
 					{/each}
+					{#each $tags.data.pages.flatMap( (page) => page.data.tags.filter((tag) => !selectedTags.includes(tag)) ) as tag, idx (idx)}
+						<Button
+							onclick={() => {
+								selectTag(tag);
+							}}
+							variant="outline"
+							size="sm"
+						>
+							<span class="text-red-600 font-bold">#</span>
+							{tag.name}
+							<span class="font-bold">{tag._count.post}</span>
+						</Button>
+					{/each}
+					{#if $tags.data.pages.at(-1)?.data.hasNextPage}
+						<IntersectionObserver
+							element={triggerMoreTagsElement}
+							bind:intersecting={isIntersecting}
+						>
+							<Button variant="outline" size="sm">...</Button>
+						</IntersectionObserver>
+					{/if}
 				{/if}
 			</LoadingState>
 		</div>
@@ -46,7 +83,7 @@
 			<Button variant="outline" size="icon" onclick={clearFilter}>
 				<Eraser />
 			</Button>
-			<Button variant="default" size="icon">
+			<Button variant="default" size="icon" onclick={() => (openFilter = true)}>
 				<Search />
 			</Button>
 		</div>

@@ -7,6 +7,7 @@
 	import { Tags, X } from '@lucide/svelte';
 	import { tick } from 'svelte';
 	import { writable } from 'svelte/store';
+  import TagItem from '$lib/components/reusable/discussion/TagItem.svelte';
 
 	type Props = {
 		tags: string[];
@@ -79,7 +80,7 @@
 					size="sm"
 				>
 					<span>
-						#{tagName}
+						<span class="text-red-600 font-bold">#</span> {tagName}
 					</span>
 					<X />
 				</Button>
@@ -125,8 +126,7 @@
 									}}
 									class="flex justify-between"
 								>
-									<span>#{tag.name}</span>
-									<span class="font-bold">{tag._count.post}</span>
+                  <TagItem {tag} />
 								</Command.Item>
 							{/each}
 						{:else}
@@ -141,8 +141,7 @@
 								}}
 								class="flex justify-between"
 							>
-								<span>#{tagSearch}</span>
-								<span class="font-bold">0</span>
+                <TagItem tag={{ id: -1, name: tagSearch, _count: { post: 0 } }} />
 							</Command.Item>
 						{/if}
 					</Command.Group>

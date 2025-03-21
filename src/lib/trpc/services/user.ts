@@ -14,7 +14,7 @@ import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import type { getUserForMentioningRequest } from '../schema/userSchema';
 import { TRPCError } from '@trpc/server';
-import type { ctxType } from '$lib/constant';
+import type { CtxType } from '$lib/constant';
 
 type User = typeof users.$inferSelect;
 export type UserPayload = {
@@ -157,7 +157,7 @@ export const verifyUserToken = async (
   return { user: null }; // When decodedPayload are null and usersFromToken.length is < 1
 };
 
-export const authenticateUser = async (formData: z.infer<LoginSchema>, ctx: ctxType) => {
+export const authenticateUser = async (formData: z.infer<LoginSchema>, ctx: CtxType) => {
   const { username, password } = formData;
   const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
 
