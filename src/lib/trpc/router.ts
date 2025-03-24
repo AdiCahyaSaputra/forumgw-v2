@@ -4,12 +4,14 @@ import { comment } from './routes/comment';
 import { post } from './routes/post';
 import { tag } from './routes/tag';
 import { user } from './routes/user';
+import { group } from './routes/group';
 
 export const router = t.router({
 	user,
 	post,
 	tag,
-	comment
+	comment,
+  group
 });
 
 export const createCaller = t.createCallerFactory(router);

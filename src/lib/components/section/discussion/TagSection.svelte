@@ -10,7 +10,6 @@
 
 	type Props = {
 		onTagSelected: (tag: SelectedTag) => void;
-		tagIds: number[];
 		clearFilter: () => void;
 		selectedTags: SelectedTag[];
 	};

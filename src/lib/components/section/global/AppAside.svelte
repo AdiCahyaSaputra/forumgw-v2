@@ -19,7 +19,7 @@
 	} from '@lucide/svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
-	import { goto } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 	import type { UserPayload } from '$lib/trpc/services/user.js';
 
 	type Props = {
@@ -66,6 +66,10 @@
 	let openAside = $state(false);
 	let isLoggingOut = $state(false);
 	let formResult: ActionResult | null = $state(null);
+
+  afterNavigate(() => {
+    openAside = false;
+  });
 </script>
 
 <aside

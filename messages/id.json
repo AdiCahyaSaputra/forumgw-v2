@@ -68,9 +68,12 @@
   "edit_comment_dialog_description": "Siapa tau ada yang typo yakan",
   "edit_comment_submit": "Edit Keun",
   "edit_comment_drawer_close": "Ga Jadi",
-
   "delete_comment_dialog_title": "Hapus Comment",
   "delete_comment_dialog_description": "Jangan biarkan netizen menyalahkanmu, hapus komentar nya!",
   "delete_comment_submit": "Hapus Komentar",
-  "delete_comment_drawer_close": "Gausah Ah"
+  "delete_comment_drawer_close": "Gausah Ah",
+  "title_user_groups": "Komunitas Kamu",
+  "empty_user_groups": "Kamu belum join komunitas apapun",
+  "title_groups": "Eksplor Komunitas",
+  "empty_groups": "Belum ada komunitas apapun"
 }
