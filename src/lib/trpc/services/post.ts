@@ -183,7 +183,8 @@ export const getPostDetail = async (input: z.infer<typeof getPostDetailRequest>)
 
 export const createNewPost = async (
   input: z.infer<ReturnType<typeof createPostRequest>>,
-  userId: (typeof users.$inferSelect)['id']
+  userId: (typeof users.$inferSelect)['id'],
+  groupId?: string
 ) => {
   const { isAnonymous, content, tags: tagsName } = input;
 
@@ -213,6 +214,7 @@ export const createNewPost = async (
       const [newPost] = await tx
         .insert(posts)
         .values({
+          groupId,
           content,
           ...(isAnonymous ? { anonymousId: anonymousUserId } : { userId })
         })

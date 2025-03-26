@@ -75,5 +75,11 @@
   "title_user_groups": "Your Communities",
   "empty_user_groups": "you don't have any communities yet",
   "title_groups": "Explore Communities",
-  "empty_groups": "No communities found"
+  "empty_groups": "No communities found",
+  "placeholder_groups_search": "Search Communities",
+  "button_create_group": "Create Community",
+  "group_form_title": "Create Community",
+  "group_form_message": "Tell us about your community",
+  "group_create_button_cancel": "Nevermind",
+  "group_create_button_submit": "Create Community"
 }

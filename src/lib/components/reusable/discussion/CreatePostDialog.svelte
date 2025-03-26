@@ -43,19 +43,19 @@
 		},
 		onSettled: () => {
 			$postMutate.reset();
-      reset();
+			reset();
 		}
 	});
 
 	let form = superForm(formCreate, {
 		validators: zodClient(createPostRequest()),
 		onSubmit: ({ formData }) => {
-			const data = Object.fromEntries(formData) as z.infer<ReturnType<typeof createPostRequest>>;
+			const data = Object.fromEntries(formData);
 
 			$postMutate.mutate({
-				...data,
 				tags,
-        isAnonymous: data.isAnonymous === 'on'
+				isAnonymous: data.isAnonymous === 'on',
+				content: data.content as string
 			});
 		}
 	});

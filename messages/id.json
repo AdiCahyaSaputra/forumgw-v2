@@ -75,5 +75,11 @@
   "title_user_groups": "Komunitas Kamu",
   "empty_user_groups": "Kamu belum join komunitas apapun",
   "title_groups": "Eksplor Komunitas",
-  "empty_groups": "Belum ada komunitas apapun"
+  "empty_groups": "Belum ada komunitas apapun",
+  "placeholder_groups_search": "Cari Komunitas",
+  "button_create_group": "Buat Komunitas",
+  "group_form_title": "Bikin Komunitas Baru",
+  "group_form_message": "Kasih tau kita tentang komunitas kamu",
+  "group_create_button_cancel": "Gak Jadi",
+  "group_create_button_submit": "Buat Komunitas"
 }

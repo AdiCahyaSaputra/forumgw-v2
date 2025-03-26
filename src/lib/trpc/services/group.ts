@@ -4,14 +4,21 @@ import { and, count, eq, inArray, like, lt, sql } from 'drizzle-orm';
 import type { UserPayload } from './user';
 import { z } from 'zod';
 import type {
+  acceptInvitationRequest,
   addNewMemberRequest,
   createGroupRequest,
+  createNewPostGroupRequst,
+  declineInvitationRequest,
   deleteGroupRequest,
   editGroupRequest,
   getAllGroupsRequest,
-  getAvailableGroupsRequest
+  getAllGroupTagRequest,
+  getAvailableGroupsRequest,
+  reportPostGroupRequest
 } from '../schema/groupSchema';
 import { sendTRPCResponse } from '$lib/utils';
+import { createNewPost, reportPost } from './post';
+import { getAllTags } from './tag';
 
 export const getAvailableGroups = async (
   input: z.infer<typeof getAvailableGroupsRequest>,
@@ -268,3 +275,131 @@ export const addNewMember = async (
 
   return response;
 };
+
+export const getAvailableInvitation = async (user: UserPayload) => {
+  const availableInvitation = await db
+    .select({
+      id: groups.id,
+      name: groups.name,
+      description: groups.description
+    })
+    .from(groupInvitations)
+    .innerJoin(groups, eq(groups.id, groupInvitations.groupId))
+    .where(eq(groupInvitations.userId, user.id));
+
+  return sendTRPCResponse(
+    {
+      status: availableInvitation.length > 0 ? 200 : 404,
+      message: 'ok'
+    },
+    availableInvitation
+  );
+};
+
+export const acceptInvitation = async (
+  input: z.infer<typeof acceptInvitationRequest>,
+  user: UserPayload
+) => {
+  const { groupId } = input;
+  const isInvitationValid = await db
+    .select()
+    .from(groupInvitations)
+    .where(and(eq(groupInvitations.groupId, groupId), eq(groupInvitations.userId, user.id)))
+    .limit(1);
+
+  if (!isInvitationValid[0]?.groupId) {
+    return sendTRPCResponse({
+      status: 404,
+      message: 'Invitation not found'
+    });
+  }
+
+  const response = await db
+    .insert(groupMembers)
+    .values({ groupId, userId: user.id })
+    .then(() => sendTRPCResponse({ status: 201, message: 'ok' }))
+    .catch(() => sendTRPCResponse({ status: 500, message: 'Error accept invitation' }));
+
+  return response;
+};
+
+export const declineInvitation = async (
+  input: z.infer<typeof declineInvitationRequest>,
+  user: UserPayload
+) => {
+  const { groupId } = input;
+
+  const isInvitationValid = await db
+    .select()
+    .from(groupInvitations)
+    .where(and(eq(groupInvitations.groupId, groupId), eq(groupInvitations.userId, user.id)))
+    .limit(1);
+
+  if (!isInvitationValid[0]?.groupId) {
+    return sendTRPCResponse({
+      status: 404,
+      message: 'Invitation not found'
+    });
+  }
+
+  const response = await db
+    .delete(groupInvitations)
+    .where(and(eq(groupInvitations.groupId, groupId), eq(groupInvitations.userId, user.id)))
+    .then(() => sendTRPCResponse({ status: 200, message: 'ok' }))
+    .catch(() => sendTRPCResponse({ status: 500, message: 'Error decline invitation' }));
+
+  return response;
+};
+
+const isGroupMember = async (groupId: string, user: UserPayload) => {
+  const isGroupMember = await db
+    .select()
+    .from(groupMembers)
+    .where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
+    .limit(1);
+
+  if (!isGroupMember[0]?.groupId) {
+    return sendTRPCResponse({
+      status: 403,
+      message: 'You are not member of this group'
+    });
+  }
+};
+
+export const getAllGroupTags = async (
+  input: z.infer<typeof getAllGroupTagRequest>,
+  user: UserPayload
+) => {
+  const { cursor, name, groupId } = input;
+
+  await isGroupMember(groupId, user);
+
+  const response = await getAllTags({ cursor, name }, groupId);
+
+  return response;
+};
+
+export const createNewPostGroup = async (
+  input: z.infer<ReturnType<typeof createNewPostGroupRequst>>,
+  user: UserPayload
+) => {
+  const { groupId, tags, isAnonymous, content } = input;
+
+  await isGroupMember(groupId, user);
+
+  const response = await createNewPost(
+    {
+      tags,
+      isAnonymous,
+      content
+    },
+    user.id,
+    groupId
+  );
+
+  return response;
+};
+
+export const reportPostGroup = async (input: z.infer<typeof reportPostGroupRequest>) => {
+  return await reportPost(input);
+}
