@@ -9,6 +9,10 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Plus } from '@lucide/svelte';
 	import ResponsiveDialog from '../global/ResponsiveDialog.svelte';
+	import * as Form from '$lib/components/ui/form/index.js';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import InviteUserInput from './InviteUserInput.svelte';
+	import { trpcClientUtils } from '$lib/utils';
 
 	type Props = {
 		formCreate: SuperValidated<Infer<ReturnType<typeof createGroupRequest>>>;
@@ -30,10 +34,16 @@
 			open = false;
 			invitedUsername = [];
 
+			trpcClientUtils($page).group.getAvailableGroups.invalidate();
+
 			toast.success(data.message);
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(m.global_error_message());
+		},
+		onSettled: () => {
+			$groupMutate.reset();
+			reset();
 		}
 	});
 
@@ -60,6 +70,27 @@
 	drawerClose={m.group_create_button_cancel()}
 >
 	<form method="POST" use:enhance>
+		<Form.Field {form} name="name">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Input {...props} name="name" placeholder="Name" autocomplete="off" class="w-full mt-2" bind:value={$formData.name} />
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+
+		<Form.Field {form} name="description">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Input {...props} name="description" placeholder="Description" autocomplete="off" class="w-full mt-2" bind:value={$formData.description} />
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+
+		<InviteUserInput bind:usernames={invitedUsername} />
+
+		<Button type="submit" disabled={$groupMutate.isPending} class="mt-4 w-full">{m.group_create_button_submit()}</Button>
     </form>
 </ResponsiveDialog>
 

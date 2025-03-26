@@ -186,7 +186,7 @@ export const createGroup = async (
           .from(users)
           .where(inArray(users.username, invitedUsername));
 
-        const groupMemberData = userIds.map(({ id }) => ({ groupId: id, userId: user.id }));
+        const groupMemberData = userIds.map(({ id: userId }) => ({ groupId: id, userId }));
 
         await tx.insert(groupInvitations).values(groupMemberData);
       }

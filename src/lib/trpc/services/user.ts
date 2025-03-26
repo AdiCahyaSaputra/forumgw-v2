@@ -12,8 +12,7 @@ import { and, eq, gt, ilike, not, sql } from 'drizzle-orm';
 import { SignJWT, jwtVerify } from 'jose';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
-import type { getUserForMentioningRequest } from '../schema/userSchema';
-import { TRPCError } from '@trpc/server';
+import type { getUserForInviteRequest, getUserForMentioningRequest } from '../schema/userSchema';
 import type { CtxType } from '$lib/constant';
 
 type User = typeof users.$inferSelect;
@@ -231,6 +230,37 @@ export const registeringNewUser = async (formData: z.infer<RegisterSchema>) => {
     message: 'ok'
   });
 };
+
+export const getUserForInvite = async (input: z.infer<typeof getUserForInviteRequest>, user: UserPayload) => {
+  const { username } = input;
+  const conditions = [not(eq(users.id, user.id))];
+
+  if(username) {
+    conditions.push(ilike(users.username, `%${username}%`));
+  }
+
+  const usersResult = await db
+   .select({
+      id: users.id,
+      name: users.name,
+      username: users.username,
+      image: users.image
+    })
+   .from(users)
+   .where(and(...conditions))
+   .limit(10);
+
+   return sendTRPCResponse(
+    {
+      status: usersResult.length > 0? 200 : 404,
+      message: 'ok'
+    },
+    {
+      users: usersResult,
+    }
+  );
+
+}
 
 export const getUserForMentioning = async (
   input: z.infer<typeof getUserForMentioningRequest>,
