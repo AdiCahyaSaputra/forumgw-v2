@@ -4,16 +4,42 @@ import { sendTRPCResponse } from '$lib/utils';
 import { and, count, eq, gt, isNull, like, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { getAllTagsRequest } from '../schema/tagSchema';
+import { isGroupMemberCheck } from './group';
+import type { UserPayload } from './user';
 
-export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>, groupId?: string) => {
-  const condition = [groupId ? eq(posts.groupId, groupId) : isNull(posts.groupId)];
+export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>, user: UserPayload) => {
+  const { groupId, cursor, name } = input;
 
-  if (input.cursor) {
-    condition.push(gt(tags.id, input.cursor));
+  const condition = [];
+
+  if(groupId) {
+   const isGroupMember = await isGroupMemberCheck(groupId, user);
+
+   if(!isGroupMember) {
+    return sendTRPCResponse(
+      {
+        status: 404,
+        message: 'not found'
+      },
+      {
+        tags: [],
+        nextCursor: null,
+        hasNextPage: false
+      }
+    );
+   }
+
+   condition.push(eq(posts.groupId, groupId));
+  } else {
+   condition.push(isNull(posts.groupId)); 
   }
 
-  if (input.name) {
-    condition.push(like(tags.name, `%${input.name}%`));
+  if (cursor) {
+    condition.push(gt(tags.id, cursor));
+  }
+
+  if (name) {
+    condition.push(like(tags.name, `%${name}%`));
   }
 
   const limit = 10;

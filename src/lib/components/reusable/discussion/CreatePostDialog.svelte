@@ -17,9 +17,10 @@
 
 	type Props = {
 		formCreate: SuperValidated<Infer<ReturnType<typeof createPostRequest>>>;
+		groupId?: string;
 	};
 
-	let { formCreate }: Props = $props();
+	let { formCreate, groupId }: Props = $props();
 
 	let open = $state(false);
 	let tags = $state<string[]>([]);
@@ -55,7 +56,8 @@
 			$postMutate.mutate({
 				tags,
 				isAnonymous: data.isAnonymous === 'on',
-				content: data.content as string
+				content: data.content as string,
+				groupId
 			});
 		}
 	});
@@ -107,7 +109,7 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<TagInput bind:tags />
+		<TagInput bind:tags {groupId} />
 
 		<Button disabled={$postMutate.isPending} type="submit" class="w-full mt-20">
 			{m.post_create_button_submit()}

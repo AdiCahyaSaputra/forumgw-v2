@@ -4,28 +4,22 @@ import {
   acceptInvitationRequest,
   addNewMemberRequest,
   createGroupRequest,
-  createNewPostGroupRequst,
   declineInvitationRequest,
   deleteGroupRequest,
   editGroupRequest,
   getAllGroupsRequest,
-  getAllGroupTagRequest,
-  getAvailableGroupsRequest,
-  reportPostGroupRequest
+  getAvailableGroupsRequest
 } from '../schema/groupSchema';
 import {
   acceptInvitation,
   addNewMember,
   createGroup,
-  createNewPostGroup,
   declineInvitation,
   deleteGroup,
   editGroup,
   getAllGroups,
-  getAllGroupTags,
   getAvailableGroups,
-  getAvailableInvitation,
-  reportPostGroup
+  getAvailableInvitation
 } from '../services/group';
 import { t } from '../t';
 
@@ -74,19 +68,4 @@ export const group = t.router({
     .use(authenticated)
     .input(declineInvitationRequest)
     .mutation(({ input, ctx }) => declineInvitation(input, ctx.user)),
-  getAllGroupTags: t.procedure
-    .use(logger)
-    .use(authenticated)
-    .input(getAllGroupTagRequest)
-    .query(({ input, ctx }) => getAllGroupTags(input, ctx.user)),
-  createNewPostGroup: t.procedure
-    .use(logger)
-    .use(authenticated)
-    .input(createNewPostGroupRequst())
-    .query(({ input, ctx }) => createNewPostGroup(input, ctx.user)),
-  reportPostGroup: t.procedure
-    .use(logger)
-    .use(authenticated)
-    .input(reportPostGroupRequest)
-    .mutation(({ input }) => reportPostGroup(input))
 });

@@ -11,12 +11,13 @@
 
 	type Props = {
 		tags: string[];
+		groupId?: string;
 	};
 
-	let { tags = $bindable() }: Props = $props();
+	let { tags = $bindable(), groupId }: Props = $props();
 
 	let tagSearch = $state('');
-	let tagSearchFilter = writable<{ name: string }>({ name: '' });
+	let tagSearchFilter = writable<{ name: string; groupId?: string }>({ name: '', groupId });
 	let open = $state(false);
 	let triggerRef = $state<HTMLButtonElement>(null!);
 
@@ -130,7 +131,7 @@
 									<TagItem {tag} />
 								</Command.Item>
 							{/each}
-						{:else}
+						{:else if tagSearch !== ''}
 							<Command.Item
 								value={tagSearch}
 								onSelect={() => {

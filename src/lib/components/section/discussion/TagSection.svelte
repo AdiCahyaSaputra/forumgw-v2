@@ -12,25 +12,29 @@
 		onTagSelected: (tag: SelectedTag) => void;
 		clearFilter: () => void;
 		selectedTags: SelectedTag[];
+		groupId?: string;
+		className?: string;
 	};
 
+	let { onTagSelected: selectTag, selectedTags, clearFilter, groupId, className }: Props = $props();
+
 	const tags = trpc($page).tag.getAllTags.createInfiniteQuery(
-		{},
+		{
+			groupId
+		},
 		{
 			getNextPageParam: (lastPage) => lastPage.data.nextCursor
 		}
 	);
-
-	let { onTagSelected: selectTag, selectedTags, clearFilter }: Props = $props();
 
 	let openFilter = $state(false);
 	let triggerMoreTagsElement: HTMLElement | null = $state(null);
 	let isIntersecting = $state(false);
 </script>
 
-<TagFilter bind:open={openFilter} {selectTag} />
+<TagFilter bind:open={openFilter} {selectTag} {groupId} />
 
-<div class="border-b sticky top-0 z-10 bg-white">
+<div class={["border-b sticky top-0 z-10 bg-white", className]}>
 	<div class="relative h-full p-8">
 		<div class="absolute inset-0 overflow-x-auto flex p-4 pr-50 no-scrollbar gap-1">
 			<LoadingState isLoading={$tags.isPending}>

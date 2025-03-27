@@ -10,10 +10,10 @@
 		previousPage = from?.url.pathname || previousPage;
 	});
 
-	const { title, url = null } = $props();
+	const { title, url = null, className = '' } = $props();
 </script>
 
-<div class="sticky top-0 z-10 border-b bg-white p-4 flex items-center gap-2">
+<div class={["sticky top-0 z-10 border-b bg-white p-4 flex items-center gap-2", className]}>
 	<Button
 		size="icon"
 		variant="outline"

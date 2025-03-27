@@ -5,9 +5,9 @@
 	import { writable } from 'svelte/store';
 	import TagItem from '$lib/components/reusable/discussion/TagItem.svelte';
 
-	let { open = $bindable(false), selectTag } = $props();
+	let { open = $bindable(false), selectTag, groupId } = $props();
 
-	let tagFilter = writable({ name: '' });
+	let tagFilter = writable({ name: '', groupId });
 	let tags = trpc($page).tag.getAllTags.createQuery(tagFilter);
 
 	let filteredTags = $derived.by(() => {

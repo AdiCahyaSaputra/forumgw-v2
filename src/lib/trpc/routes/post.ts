@@ -7,8 +7,9 @@ import { authenticated } from '../middleware/authenticated';
 export const post = t.router({
 	getPublicPostDiscussions: t.procedure
 		.use(logger)
+    .use(authenticated)
 		.input(getPublicPostDiscussionsRequest())
-		.query(({ input }) => getPublicPostDiscussions(input)),
+		.query(({ input, ctx }) => getPublicPostDiscussions(input, ctx.user)),
 	getPostDetail: t.procedure
 		.use(logger)
 		.input(getPostDetailRequest)
@@ -17,7 +18,7 @@ export const post = t.router({
     .use(logger)
     .use(authenticated)
     .input(createPostRequest())
-    .mutation(({ input, ctx }) => createNewPost(input, ctx.user.id)),
+    .mutation(({ input, ctx }) => createNewPost(input, ctx.user)),
   reportPost: t.procedure
     .use(logger)
     .use(authenticated)

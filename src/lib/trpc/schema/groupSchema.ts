@@ -40,6 +40,12 @@ export const deleteGroupRequest = z.object({
 	groupId: z.string()
 });
 
+export const getAllGroupPostsRequest = z.object({
+	groupId: z.string(),
+	tagIds: z.array(z.number()).default([]),
+	cursor: z.string().optional()
+});
+
 export const addNewMemberRequest = z.object({
 	groupId: z.string(),
 	invitedUsername: z.array(z.string()).default([])

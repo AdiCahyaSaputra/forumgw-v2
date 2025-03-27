@@ -4,10 +4,10 @@
 	import * as Command from '$lib/components/ui/command/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { trpc } from '$lib/trpc/client';
-	import { Tags, X, UserPlus } from '@lucide/svelte';
+	import { X, UserPlus } from '@lucide/svelte';
 	import { tick } from 'svelte';
 	import { writable } from 'svelte/store';
-	import TagItem from '$lib/components/reusable/discussion/TagItem.svelte';
+	import UserItem from '$lib/components/reusable/group/UserItem.svelte';
 
 	type Props = {
 		usernames: string[];
@@ -31,7 +31,9 @@
 			data =
 				usernameSearch === ''
 					? users
-					: users.filter((user) => user.username.toLowerCase().includes(usernameSearch.toLowerCase()));
+					: users.filter((user) =>
+							user.username.toLowerCase().includes(usernameSearch.toLowerCase())
+						);
 		}
 
 		return data;
@@ -50,7 +52,7 @@
 		const timeout = setTimeout(() => {
 			const isExists = $allUsers.data?.data.users.find(
 				(user) => user.username.toLowerCase() === usernameSearch.toLowerCase()
-			)?.name;
+			)?.username;
 
 			if (!isExists) {
 				$usernameSearchFilter.username = usernameSearch; // Only trigger refetch when current 10 tags is not match with tagSearch
@@ -79,10 +81,7 @@
 					}}
 					size="sm"
 				>
-					<span>
-						<span class="text-red-600 font-bold">@</span>
-						{username}
-					</span>
+					<UserItem {username} />
 					<X />
 				</Button>
 			{/each}
@@ -114,24 +113,21 @@
 				<Command.Input placeholder="Username..." />
 				<Command.List>
 					<Command.Group>
-							{#each filterUsers as user, idx (idx)}
-								<Command.Item
-									value={user.username}
-									onSelect={() => {
-										if (!usernames.includes(user.username)) {
-                                            usernames = [...usernames, user.username];
-										}
+						{#each filterUsers as user, idx (idx)}
+							<Command.Item
+								value={user.username}
+								onSelect={() => {
+									if (!usernames.includes(user.username)) {
+										usernames = [...usernames, user.username];
+									}
 
-										closeAndFocusTrigger();
-									}}
-									class="flex justify-between"
-								>
-                                    <span>
-                                        <span class="text-red-600 font-bold">@</span>
-                                        {user.username}
-                                    </span>
-								</Command.Item>
-							{/each}
+									closeAndFocusTrigger();
+								}}
+								class="flex justify-between"
+							>
+								<UserItem username={user.username} />
+							</Command.Item>
+						{/each}
 					</Command.Group>
 				</Command.List>
 			</Command.Root>

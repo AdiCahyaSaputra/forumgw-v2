@@ -7,5 +7,4 @@ export const getUserForMentioningRequest = z.object({
 
 export const getUserForInviteRequest = z.object({
   username: z.string().optional(),
-  cursor: z.string().optional(),
 });

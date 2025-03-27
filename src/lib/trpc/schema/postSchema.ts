@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 export const getPublicPostDiscussionsRequest = () =>
 	z.object({
+		groupId: z.string().optional(),
 		tagIds: z.array(z.number()).default([]),
 		cursor: z.string().optional()
 	});
@@ -13,6 +14,7 @@ export const getPostDetailRequest = z.object({
 
 export const createPostRequest = () =>
 	z.object({
+		groupId: z.string().optional(),
 		tags: z.array(z.string()).default([]),
 		isAnonymous: z.boolean().default(false),
 		content: z

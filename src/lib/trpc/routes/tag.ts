@@ -9,5 +9,5 @@ export const tag = t.router({
     .use(logger)
     .use(authenticated)
     .input(getAllTagsRequest)
-    .query(({ input }) => getAllTags(input))
+    .query(({ input, ctx }) => getAllTags(input, ctx.user))
 });

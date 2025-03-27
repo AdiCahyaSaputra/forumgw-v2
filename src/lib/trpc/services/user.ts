@@ -241,10 +241,7 @@ export const getUserForInvite = async (input: z.infer<typeof getUserForInviteReq
 
   const usersResult = await db
    .select({
-      id: users.id,
-      name: users.name,
       username: users.username,
-      image: users.image
     })
    .from(users)
    .where(and(...conditions))
