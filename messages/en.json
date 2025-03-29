@@ -82,5 +82,8 @@
   "group_form_message": "Tell us about your community",
   "group_create_button_cancel": "Nevermind",
   "group_create_button_submit": "Create Community",
-  "group_detail_back_button": "Back to Communities"
+  "group_detail_back_button": "Back to Communities",
+  "group_member_popup_title": "Members",
+  "group_member_popup_description": "Who are the members of this community?",
+  "group_member_popup_close": "Close"
 }

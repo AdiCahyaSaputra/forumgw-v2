@@ -11,6 +11,11 @@ export const load: PageServerLoad = async (event) => {
 		.select({
 			name: groups.name,
 			description: groups.description,
+			leader: {
+				name: users.name,
+				username: users.username,
+				image: users.image
+			},
 			_count: {
 				members: sql<number>`
 						(
@@ -22,6 +27,7 @@ export const load: PageServerLoad = async (event) => {
 			}
 		})
 		.from(groups)
+		.innerJoin(users, eq(groups.leaderId, users.id))
 		.where(eq(groups.id, event.params.id))
 		.limit(1);
 

@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/private';
 import { JWT_SECRET } from '$env/static/private';
 import * as m from '$lib/paraglide/messages.js';
 import { db } from '$lib/server/db';
-import { groupMembers, jwts, users } from '$lib/server/db/schema';
+import { groupMembers, jwts, roles, users } from '$lib/server/db/schema';
 import type { LoginSchema } from '$lib/trpc/schema/loginSchema.js';
 import type { RegisterSchema } from '$lib/trpc/schema/registerSchema.js';
 import { sendTRPCResponse } from '$lib/utils.js';
@@ -16,11 +16,14 @@ import type { getUserForInviteRequest, getUserForMentioningRequest } from '../sc
 import type { CtxType } from '$lib/constant';
 
 type User = typeof users.$inferSelect;
+type Role = typeof roles.$inferSelect;
+
 export type UserPayload = {
   id: User['id'];
   name: User['name'];
   username: User['username'];
   image: User['image'];
+  role: Role['name'];
 };
 type JWTPayload = Omit<typeof jwts.$inferSelect, 'userId'>;
 
@@ -79,10 +82,12 @@ export const refreshJWT = async (refreshToken: string) => {
         id: users.id,
         name: users.name,
         username: users.username,
-        image: users.image
+        image: users.image,
+        role: roles.name
       })
       .from(jwts)
-      .leftJoin(users, eq(jwts.userId, users.id))
+      .innerJoin(users, eq(jwts.userId, users.id))
+      .innerJoin(roles, eq(users.roleId, roles.id))
       .where(and(eq(jwts.id, decodedPayload.id), gt(jwts.expiredIn, sql`NOW()`)))
       .limit(1);
 
@@ -139,10 +144,12 @@ export const verifyUserToken = async (
         id: users.id,
         name: users.name,
         username: users.username,
-        image: users.image
+        image: users.image,
+        role: roles.name
       })
       .from(jwts)
-      .leftJoin(users, eq(jwts.userId, users.id))
+      .innerJoin(users, eq(jwts.userId, users.id))
+      .leftJoin(roles, eq(users.roleId, roles.id))
       .where(and(eq(jwts.id, decodedPayload.id), gt(jwts.expiredIn, sql`NOW()`)))
       .limit(1);
 
@@ -216,7 +223,8 @@ export const registeringNewUser = async (formData: z.infer<RegisterSchema>) => {
     .values({
       name,
       username,
-      password: hashedPassword
+      password: hashedPassword,
+      roleId: 2
     })
     .catch(() =>
       sendTRPCResponse({
@@ -235,21 +243,21 @@ export const getUserForInvite = async (input: z.infer<typeof getUserForInviteReq
   const { username } = input;
   const conditions = [not(eq(users.id, user.id))];
 
-  if(username) {
+  if (username) {
     conditions.push(ilike(users.username, `%${username}%`));
   }
 
   const usersResult = await db
-   .select({
+    .select({
       username: users.username,
     })
-   .from(users)
-   .where(and(...conditions))
-   .limit(10);
+    .from(users)
+    .where(and(...conditions))
+    .limit(10);
 
-   return sendTRPCResponse(
+  return sendTRPCResponse(
     {
-      status: usersResult.length > 0? 200 : 404,
+      status: usersResult.length > 0 ? 200 : 404,
       message: 'ok'
     },
     {

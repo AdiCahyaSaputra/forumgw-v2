@@ -12,6 +12,7 @@
 		Loader2,
 		LogOut,
 		Mail,
+		Megaphone,
 		Menu,
 		Rss,
 		User,
@@ -67,9 +68,9 @@
 	let isLoggingOut = $state(false);
 	let formResult: ActionResult | null = $state(null);
 
-  afterNavigate(() => {
-    openAside = false;
-  });
+	afterNavigate(() => {
+		openAside = false;
+	});
 </script>
 
 <aside
@@ -95,13 +96,9 @@
 				<NavItem {...item} />
 			{/each}
 
-			<!-- {user.role === "developer" && ( -->
-			<!--   <NavItem -->
-			<!--     url="/reported-post" -->
-			<!--     label="Reported Post" -->
-			<!--     Icon={Megaphone} -->
-			<!--   /> -->
-			<!-- )} -->
+			{#if user?.role === 'developer'}
+				<NavItem url="/reported-post" label="Reported Post" icon={Megaphone} />
+			{/if}
 		</ul>
 
 		<h2 class="text-lg font-bold mt-4 text-foreground">{m.nav_title_setting()}</h2>

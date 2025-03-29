@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { groupInvitations, groupMembers, groups, users } from '$lib/server/db/schema';
-import { and, eq, ilike, inArray, lt, sql } from 'drizzle-orm';
+import { and, eq, ilike, inArray, lt, not, sql } from 'drizzle-orm';
 import type { UserPayload } from './user';
 import { z } from 'zod';
 import type {
@@ -11,7 +11,8 @@ import type {
 	deleteGroupRequest,
 	editGroupRequest,
 	getAllGroupsRequest,
-	getAvailableGroupsRequest
+	getAvailableGroupsRequest,
+	getGroupMembersRequest
 } from '../schema/groupSchema';
 import { sendTRPCResponse } from '$lib/utils';
 
@@ -332,6 +333,46 @@ export const declineInvitation = async (
 		.catch(() => sendTRPCResponse({ status: 500, message: 'Error decline invitation' }));
 
 	return response;
+};
+
+export const getGroupMembers = async (input: z.infer<typeof getGroupMembersRequest>) => {
+	const { groupId, cursor } = input;
+
+	const limit = 10;
+	const conditions = [eq(groupMembers.groupId, groupId), not(eq(groupMembers.userId, groups.leaderId))];
+
+	if (cursor) {
+		conditions.push(lt(groupMembers.id, cursor));
+	}
+
+	const groupMembersData = await db
+		.select({
+			groupMemberId: groupMembers.id,
+			name: users.name,
+			username: users.username,
+			image: users.image,
+		})
+		.from(groupMembers)
+		.innerJoin(groups, eq(groupMembers.groupId, groups.id))
+		.innerJoin(users, eq(groupMembers.userId, users.id))
+		.where(and(...conditions))
+		.limit(limit + 1);
+
+	const hasNextPage = groupMembersData.length > limit;
+	const paginatedResults = groupMembersData.slice(0, limit);
+	const nextCursor = hasNextPage ? paginatedResults[limit - 1].groupMemberId : null;
+
+	return sendTRPCResponse(
+		{
+			status: groupMembersData.length > 0 ? 200 : 404,
+			message: 'ok'
+		},
+		{
+			groupMembers: groupMembersData,
+			nextCursor,
+			hasNextPage
+		}
+	);
 };
 
 export const isGroupMemberCheck = async (groupId: string, user: UserPayload) => {

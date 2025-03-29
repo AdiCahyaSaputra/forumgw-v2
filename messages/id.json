@@ -82,5 +82,8 @@
   "group_form_message": "Kasih tau kita tentang komunitas kamu",
   "group_create_button_cancel": "Gak Jadi",
   "group_create_button_submit": "Buat Komunitas",
-  "group_detail_back_button": "Kembali ke Komunitas"
+  "group_detail_back_button": "Kembali ke Komunitas",
+  "group_member_popup_title": "Anggota Komunitas",
+  "group_member_popup_description": "Siapa aja yang ada di komunitas ini?",
+  "group_member_popup_close": "Tutup"
 }

@@ -81,3 +81,8 @@ export const reportPostGroupRequest = z.object({
 	reason: z.string().optional().default('-'),
 	id: z.string()
 });
+
+export const getGroupMembersRequest = z.object({
+	groupId: z.string(),
+	cursor: z.number().optional() // groupMemberId
+});

@@ -73,7 +73,14 @@
 		<Form.Field {form} name="name">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Input {...props} name="name" placeholder="Name" autocomplete="off" class="w-full mt-2" bind:value={$formData.name} />
+					<Input
+						{...props}
+						name="name"
+						placeholder="Name"
+						autocomplete="off"
+						class="w-full mt-2"
+						bind:value={$formData.name}
+					/>
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
@@ -82,7 +89,14 @@
 		<Form.Field {form} name="description">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Input {...props} name="description" placeholder="Description" autocomplete="off" class="w-full mt-2" bind:value={$formData.description} />
+					<Input
+						{...props}
+						name="description"
+						placeholder="Description"
+						autocomplete="off"
+						class="w-full mt-2"
+						bind:value={$formData.description}
+					/>
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
@@ -90,8 +104,10 @@
 
 		<InviteUserInput bind:usernames={invitedUsername} />
 
-		<Button type="submit" disabled={$groupMutate.isPending} class="mt-4 w-full">{m.group_create_button_submit()}</Button>
-    </form>
+		<Button type="submit" disabled={$groupMutate.isPending} class="mt-20 w-full">
+      {m.group_create_button_submit()}
+    </Button>
+	</form>
 </ResponsiveDialog>
 
 <Button onclick={() => (open = true)} class="mt-4 lg:w-max w-full">

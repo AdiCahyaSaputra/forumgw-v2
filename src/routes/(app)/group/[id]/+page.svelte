@@ -13,8 +13,8 @@
 	import type { SelectedTag } from '$lib/constant';
 	import BackNavigation from '$lib/components/reusable/global/BackNavigation.svelte';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import MemberPopup from '$lib/components/reusable/group/MemberPopup.svelte';
 
 	type PostsInput = z.infer<ReturnType<typeof getPublicPostDiscussionsRequest>>;
 
@@ -56,11 +56,11 @@
 
 	<div class="mt-4">
 		<h4 class="font-bold">Member List</h4>
-		<div class="flex items-center gap-4">
-			<div class="flex rtl:space-x-reverse mt-2">
-				{#each data.groupMetadata.members as member, idx (idx)}
+		<div class="flex flex-col mt-2 gap-2 items-start">
+			<div class="flex rtl:space-x-reverse">
+				{#each data.groupMetadata.members.slice(0,2) as member, idx (idx)}
 					<Avatar.Root
-						class="border m-0 rounded-md"
+						class="border border-primary m-0 rounded-full"
 						style={{
 							transform: `translateX(${idx * -1}rem)`
 						}}
@@ -72,9 +72,11 @@
 					</Avatar.Root>
 				{/each}
 			</div>
-			<Button variant="link" class="p-0 hover:underline gap-0">
-				<span class="font-bold">{data.groupMetadata._count.members}</span>&nbsp;Members
-			</Button>
+			<MemberPopup
+				countMembers={data.groupMetadata._count.members}
+				groupId={data.params.id}
+				leader={data.groupMetadata.leader}
+			/>
 		</div>
 	</div>
 </div>
