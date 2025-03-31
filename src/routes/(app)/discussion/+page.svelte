@@ -59,6 +59,7 @@
 	}}
 	clearFilter={() => {
 		$postsInput = { tagIds: [] };
+		selectedTags = [];
 	}}
 	{selectedTags}
 />

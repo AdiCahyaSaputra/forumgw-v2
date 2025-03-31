@@ -26,9 +26,10 @@
   "nav_item_group": "Grup Komunitas",
   "nav_item_manage_post": "Kelola Post",
   "nav_item_manage_group": "Kelola Grup",
-  "nav_item_account": "Akun Dirimu",
+  "nav_item_account": "Akun Kamu",
   "nav_item_notification": "Notifikasi",
   "nav_item_invite": "Undangan Grup",
+  "nav_item_reported_post": "Postingan Yang Dilaporkan",
   "see_profile": "Lihat Profil",
   "mobile_open_menu": "Buka Menu",
   "mobile_close_menu": "Tutup Menu",
@@ -85,5 +86,15 @@
   "group_detail_back_button": "Kembali ke Komunitas",
   "group_member_popup_title": "Anggota Komunitas",
   "group_member_popup_description": "Siapa aja yang ada di komunitas ini?",
-  "group_member_popup_close": "Tutup"
+  "group_member_popup_close": "Tutup",
+  "post_form_edit_button": "Edit",
+  "post_form_edit_title": "Edit Post",
+  "post_form_edit_description": "Siapa tau aja postingan nya ada yang salah",
+  "post_form_edit_submit": "Edit Post",
+  "post_form_edit_cancel": "Gak Jadi",
+  "post_form_delete_button": "Hapus",
+  "post_form_delete_title": "Hapus Post",
+  "post_form_delete_description": "Yakin pengen hapus postingannya?",
+  "post_form_delete_submit": "Hapus",
+  "post_form_delete_cancel": "Gak Jadi"
 }

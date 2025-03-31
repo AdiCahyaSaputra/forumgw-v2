@@ -29,9 +29,6 @@ importers:
       drizzle-orm:
         specifier: ^0.40.0
         version: 0.40.0(gel@2.0.1)(postgres@3.4.5)
-      drizzle-seed:
-        specifier: ^0.3.1
-        version: 0.3.1(drizzle-orm@0.40.0(gel@2.0.1)(postgres@3.4.5))
       jose:
         specifier: ^6.0.8
         version: 6.0.8
@@ -1863,14 +1860,6 @@ packages:
       sql.js:
         optional: true
       sqlite3:
-        optional: true
-
-  drizzle-seed@0.3.1:
-    resolution: {integrity: sha512-F/0lgvfOAsqlYoHM/QAGut4xXIOXoE5VoAdv2FIl7DpGYVXlAzKuJO+IphkKUFK3Dz+rFlOsQLnMNrvoQ0cx7g==}
-    peerDependencies:
-      drizzle-orm: '>=0.36.4'
-    peerDependenciesMeta:
-      drizzle-orm:
         optional: true
 
   dunder-proto@1.0.1:
@@ -4636,12 +4625,6 @@ snapshots:
       gel: 2.0.1
       postgres: 3.4.5
 
-  drizzle-seed@0.3.1(drizzle-orm@0.40.0(gel@2.0.1)(postgres@3.4.5)):
-    dependencies:
-      pure-rand: 6.1.0
-    optionalDependencies:
-      drizzle-orm: 0.40.0(gel@2.0.1)(postgres@3.4.5)
-
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -5454,7 +5437,8 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  pure-rand@6.1.0: {}
+  pure-rand@6.1.0:
+    optional: true
 
   queue-microtask@1.2.3: {}
 

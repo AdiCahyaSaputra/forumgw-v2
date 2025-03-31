@@ -7,6 +7,7 @@
 	import { timeAgo } from '$lib/utils';
 	import { MessageSquare } from '@lucide/svelte';
 	import ReportPostDialog from './ReportPostDialog.svelte';
+	import type { Snippet } from 'svelte';
 
 	type Props = {
 		post: {
@@ -27,9 +28,10 @@
 				comment: number;
 			};
 		};
+    extraActions?: Snippet
 	};
 
-	const { post }: Props = $props();
+	const { post, extraActions }: Props = $props();
 </script>
 
 <div class="border-b">
@@ -48,7 +50,7 @@
 			<div>
 				{#if post.user}
 					<h3 class="text-sm leading-none font-bold">{post.user.name}</h3>
-					<a href={`/profil/${post.user.username}`} class="text-sm hover:underline">
+					<a href={`/profile/${post.user.username}`} class="text-sm hover:underline">
 						{post.user.username}
 					</a>
 				{:else if post.anonymous}
@@ -73,7 +75,7 @@
 		<p class="cst-wrap-text">{post.content}</p>
 	</div>
 
-	<div class="px-4 pb-4">
+	<div class="px-4 pb-4 flex gap-1">
 		<Button
 			onclick={() => {
 				goto(`/discussion/${post.id}`);
@@ -84,5 +86,7 @@
 			<span>{post._count.comment}</span>
 		</Button>
 		<ReportPostDialog id={post.id} />
+
+    {@render extraActions?.()}
 	</div>
 </div>

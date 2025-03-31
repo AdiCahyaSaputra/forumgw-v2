@@ -3,21 +3,23 @@ import * as m from '$lib/paraglide/messages.js';
 import { db } from '$lib/server/db';
 import { anonymous, comments, posts, reports, tagPosts, tags, users } from '$lib/server/db/schema';
 import { sendTRPCResponse } from '$lib/utils';
-import { and, eq, inArray, isNull, lt, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, lt, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type {
-  createPostRequest,
-  getPublicPostDiscussionsRequest,
-  reportPostRequest
+	createPostRequest,
+	deletePostRequest,
+	editPostRequest,
+	getPublicPostDiscussionsRequest,
+	reportPostRequest
 } from '../schema/postSchema';
 import { getPostDetailRequest } from './../schema/postSchema';
 import type { UserPayload } from './user';
 
 export const getPublicPostDiscussions = async (
 	input: z.infer<ReturnType<typeof getPublicPostDiscussionsRequest>>,
-  user: UserPayload
+	user: UserPayload
 ) => {
-	const { tagIds, cursor, groupId } = input;
+	const { tagIds, cursor, groupId, onlyCurrentUser } = input;
 
 	const limit = 10;
 	const conditions = [];
@@ -26,14 +28,17 @@ export const getPublicPostDiscussions = async (
 		const isGroupMember = await isGroupMemberCheck(groupId, user);
 
 		if (!isGroupMember) {
-			return sendTRPCResponse({
-				status: 403,
-				message: 'You are not a member of this group'
-			}, {
-        posts: [],
-        nextCursor: null,
-        hasNextPage: false
-      });
+			return sendTRPCResponse(
+				{
+					status: 403,
+					message: 'You are not a member of this group'
+				},
+				{
+					posts: [],
+					nextCursor: null,
+					hasNextPage: false
+				}
+			);
 		}
 
 		conditions.push(eq(posts.groupId, groupId));
@@ -43,6 +48,10 @@ export const getPublicPostDiscussions = async (
 
 	if (tagIds.length > 0) {
 		conditions.push(inArray(tags.id, tagIds));
+	}
+
+	if (onlyCurrentUser) {
+		conditions.push(or(eq(posts.userId, user.id), eq(anonymous.userId, user.id)));
 	}
 
 	if (cursor) {
@@ -204,20 +213,20 @@ export const getPostDetail = async (input: z.infer<typeof getPostDetailRequest>)
 
 export const createNewPost = async (
 	input: z.infer<ReturnType<typeof createPostRequest>>,
-	user: UserPayload,
+	user: UserPayload
 ) => {
 	const { isAnonymous, content, tags: tagsName, groupId } = input;
 
-  if(groupId){
-    const isGroupMember = await isGroupMemberCheck(groupId, user);
+	if (groupId) {
+		const isGroupMember = await isGroupMemberCheck(groupId, user);
 
-    if (!isGroupMember) {
-      return sendTRPCResponse({
-        status: 403,
-        message: 'You are not a member of this group'
-      });
-    }
-  }
+		if (!isGroupMember) {
+			return sendTRPCResponse({
+				status: 403,
+				message: 'You are not a member of this group'
+			});
+		}
+	}
 
 	try {
 		const trpcResponse = await db.transaction(async (tx) => {
@@ -294,6 +303,165 @@ export const createNewPost = async (
 			status: 500,
 			message: m.global_error_message()
 		});
+	}
+};
+
+export const editPost = async (
+	input: z.infer<ReturnType<typeof editPostRequest>>,
+	user: UserPayload
+) => {
+	const { isAnonymous, content, tags: tagsName, groupId, postId } = input;
+
+	if (groupId) {
+		const isGroupMember = await isGroupMemberCheck(groupId, user);
+
+		if (!isGroupMember) {
+			return sendTRPCResponse({
+				status: 403,
+				message: 'You are not a member of this group'
+			});
+		}
+	}
+
+	try {
+		const trpcResponse = await db.transaction(async (tx) => {
+			const conditions = [eq(posts.id, postId)];
+			const authorizedPost = [eq(posts.userId, user.id)];
+
+			let anonymousUserId: (typeof anonymous.$inferSelect)['id'] | null = null;
+
+			const isAnonymousUserExists = await tx
+				.select({ id: anonymous.id })
+				.from(anonymous)
+				.where(eq(anonymous.userId, user.id))
+				.limit(1);
+
+			// If the post is already anonymous, then we need to verify for authorizing edit action
+			anonymousUserId = isAnonymousUserExists[0]?.id;
+
+			if (isAnonymous) {
+				// User want to change this post to anonymous post, but the user didn't have anonymous user yet
+				if (isAnonymousUserExists.length < 1) {
+					const [newAnonymousUser] = await tx
+						.insert(anonymous)
+						.values({ userId: user.id })
+						.returning({ id: anonymous.id });
+
+					anonymousUserId = newAnonymousUser.id;
+				}
+			}
+
+			authorizedPost.push(eq(posts.anonymousId, anonymousUserId));
+
+			conditions.push(or(...authorizedPost)); // Authorize who edit the post
+
+			const [updatedPost] = await tx
+				.update(posts)
+				.set({
+					groupId,
+					content,
+					...(isAnonymous
+						? { anonymousId: anonymousUserId, userId: null }
+						: { userId: user.id, anonymousId: null })
+				})
+				.where(and(...conditions))
+				.returning({ id: posts.id });
+
+			if (tagsName.length > 0) {
+				const existingTags = await tx
+					.select({ name: tags.name, id: tags.id })
+					.from(tags)
+					.where(inArray(tags.name, tagsName));
+
+				const tagsData = tagsName
+					.filter((tagName) => !existingTags.find((tag) => tagName === tag.name))
+					.map((name) => ({ name }));
+
+				let newTags: typeof existingTags = [];
+
+				if (tagsData.length > 0) {
+					newTags = await tx.insert(tags).values(tagsData).returning({
+						id: tags.id,
+						name: tags.name
+					});
+				}
+
+				// Old existing tag should not add the count of their post onPostUpdate
+				const tagPostsData = [...newTags].map((tag) => ({
+					tagId: tag.id,
+					postId: updatedPost.id
+				}));
+
+				if (tagPostsData.length > 0) {
+					await tx.insert(tagPosts).values(tagPostsData);
+				}
+			}
+
+			return sendTRPCResponse({
+				status: 201,
+				message: 'Edited!'
+			});
+		});
+
+		return trpcResponse;
+	} catch (error) {
+		console.error('Transaction failed:', {
+			error,
+			input,
+			user
+		});
+
+		return sendTRPCResponse({
+			status: 500,
+			message: m.global_error_message()
+		});
+	}
+};
+
+export const deletePost = async (input: z.infer<typeof deletePostRequest>, user: UserPayload) => {
+	const { postId, groupId } = input;
+
+	const conditions = [eq(posts.id, postId)];
+	const authorizedPost = [eq(posts.userId, user.id)];
+
+	if (groupId) {
+		const isGroupMember = await isGroupMemberCheck(groupId, user);
+
+		if (!isGroupMember) {
+			return sendTRPCResponse({
+				status: 403,
+				message: 'You are not a member of this group'
+			});
+		}
+	}
+
+	try {
+		const isAnonymousUserExists = await db
+			.select({ id: anonymous.id })
+			.from(anonymous)
+			.where(eq(anonymous.userId, user.id))
+			.limit(1);
+
+		authorizedPost.push(eq(posts.anonymousId, isAnonymousUserExists[0]?.id));
+		conditions.push(or(...authorizedPost));
+
+		const result = await db
+			.delete(posts)
+			.where(and(...conditions))
+			.then(() => sendTRPCResponse({ status: 200, message: 'ok' }))
+			.catch((err) => sendTRPCResponse({ status: 500, message: m.global_error_message() }, { err }));
+
+		return result;
+	} catch (err) {
+		console.log(err);
+
+		return sendTRPCResponse(
+			{
+				status: 500,
+				message: m.global_error_message()
+			},
+			err
+		);
 	}
 };
 

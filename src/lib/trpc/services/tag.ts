@@ -8,34 +8,38 @@ import { isGroupMemberCheck } from './group';
 import type { UserPayload } from './user';
 
 export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>, user: UserPayload) => {
-  const { groupId, cursor, name } = input;
+  const { groupId, cursor, name, onlyCurrentUser } = input;
 
   const condition = [];
 
-  if(groupId) {
-   const isGroupMember = await isGroupMemberCheck(groupId, user);
+  if (groupId) {
+    const isGroupMember = await isGroupMemberCheck(groupId, user);
 
-   if(!isGroupMember) {
-    return sendTRPCResponse(
-      {
-        status: 404,
-        message: 'not found'
-      },
-      {
-        tags: [],
-        nextCursor: null,
-        hasNextPage: false
-      }
-    );
-   }
+    if (!isGroupMember) {
+      return sendTRPCResponse(
+        {
+          status: 404,
+          message: 'not found'
+        },
+        {
+          tags: [],
+          nextCursor: null,
+          hasNextPage: false
+        }
+      );
+    }
 
-   condition.push(eq(posts.groupId, groupId));
+    condition.push(eq(posts.groupId, groupId));
   } else {
-   condition.push(isNull(posts.groupId)); 
+    condition.push(isNull(posts.groupId));
   }
 
   if (cursor) {
     condition.push(gt(tags.id, cursor));
+  }
+
+  if (onlyCurrentUser) {
+    condition.push(eq(posts.userId, user.id));
   }
 
   if (name) {
@@ -74,5 +78,5 @@ export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>, user:
       nextCursor,
       hasNextPage
     }
-  );
+	);
 };

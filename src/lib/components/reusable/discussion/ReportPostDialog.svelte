@@ -56,6 +56,6 @@
 	</form>
 </ResponsiveDialog>
 
-<Button variant="destructive" onclick={() => (open = true)}>
+<Button variant="destructive" size="icon" onclick={() => (open = true)}>
 	<Siren />
 </Button>

@@ -12,15 +12,17 @@
 		onTagSelected: (tag: SelectedTag) => void;
 		clearFilter: () => void;
 		selectedTags: SelectedTag[];
+		onlyCurrentUser?: boolean;
 		groupId?: string;
 		className?: string;
 	};
 
-	let { onTagSelected: selectTag, selectedTags, clearFilter, groupId, className }: Props = $props();
+	let { onTagSelected: selectTag, selectedTags, clearFilter, groupId, className, onlyCurrentUser }: Props = $props();
 
 	const tags = trpc($page).tag.getAllTags.createInfiniteQuery(
 		{
-			groupId
+			groupId,
+      onlyCurrentUser
 		},
 		{
 			getNextPageParam: (lastPage) => lastPage.data.nextCursor
@@ -30,11 +32,17 @@
 	let openFilter = $state(false);
 	let triggerMoreTagsElement: HTMLElement | null = $state(null);
 	let isIntersecting = $state(false);
+
+	let tagItems = $derived.by(() => {
+		if (!$tags.data) return [];
+
+		return $tags.data.pages.flatMap((page) => page.data.tags);
+	});
 </script>
 
 <TagFilter bind:open={openFilter} {selectTag} {groupId} />
 
-<div class={["border-b sticky top-0 z-10 bg-white", className]}>
+<div class={['border-b sticky top-0 z-10 bg-white', className]}>
 	<div class="relative h-full p-8">
 		<div class="absolute inset-0 overflow-x-auto flex p-4 pr-50 no-scrollbar gap-1">
 			<LoadingState isLoading={$tags.isPending}>
@@ -58,18 +66,20 @@
 							<span class="font-bold">{tag._count.post}</span>
 						</Button>
 					{/each}
-					{#each $tags.data.pages.flatMap( (page) => page.data.tags.filter((tag) => !selectedTags.includes(tag)) ) as tag, idx (idx)}
-						<Button
-							onclick={() => {
-								selectTag(tag);
-							}}
-							variant="outline"
-							size="sm"
-						>
-							<span class="text-red-600 font-bold">#</span>
-							{tag.name}
-							<span class="font-bold">{tag._count.post}</span>
-						</Button>
+					{#each tagItems as tag, idx (idx)}
+						{#if !selectedTags.find((selectedTag) => selectedTag.id === tag.id)}
+							<Button
+								onclick={() => {
+									selectTag(tag);
+								}}
+								variant="outline"
+								size="sm"
+							>
+								<span class="text-red-600 font-bold">#</span>
+								{tag.name}
+								<span class="font-bold">{tag._count.post}</span>
+							</Button>
+						{/if}
 					{/each}
 					{#if $tags.data.pages.at(-1)?.data.hasNextPage}
 						<IntersectionObserver

@@ -81,7 +81,7 @@
 	</div>
 </div>
 
-<div class="relative h-[20000px]">
+<div class="relative">
 	<TagSection
 		onTagSelected={(tag: SelectedTag) => {
 			const clonedTagIds = [...$postsInput.tagIds];

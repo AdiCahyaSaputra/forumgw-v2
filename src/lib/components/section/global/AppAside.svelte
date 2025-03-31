@@ -42,7 +42,7 @@
 
 	const navSettingItems = [
 		{
-			url: '/akun',
+			url: '/account',
 			label: m.nav_item_account(),
 			icon: User
 		}
@@ -50,7 +50,7 @@
 
 	const navDashboardItems = [
 		{
-			url: '/manage',
+			url: '/manage-post',
 			label: m.nav_item_manage_post(),
 			icon: GanttChartSquare
 		},
@@ -97,7 +97,7 @@
 			{/each}
 
 			{#if user?.role === 'developer'}
-				<NavItem url="/reported-post" label="Reported Post" icon={Megaphone} />
+				<NavItem url="/reported-post" label={m.nav_item_reported_post()} icon={Megaphone} />
 			{/if}
 		</ul>
 
@@ -106,8 +106,8 @@
 			{#each navSettingItems as item, idx (idx)}
 				<NavItem {...item} />
 			{/each}
-			<NavItem url="/notifikasi" label={`${1} ${m.nav_item_notification()}`} icon={BellRing} />
-			<NavItem url="/undangan" label={`${1} ${m.nav_item_invite()}`} icon={Mail} />
+			<NavItem url="/notification" label={`${1} ${m.nav_item_notification()}`} icon={BellRing} />
+			<NavItem url="/invitation" label={`${1} ${m.nav_item_invite()}`} icon={Mail} />
 		</ul>
 	</div>
 
@@ -133,7 +133,7 @@
 							</h3>
 						{/snippet}
 					</LoadingState>
-					<a href={`/profil/${user?.username}`} class="text-xs hover:underline">{m.see_profile()}</a
+					<a href={`/profile/${user?.username}`} class="text-xs hover:underline">{m.see_profile()}</a
 					>
 				</div>
 				<form
