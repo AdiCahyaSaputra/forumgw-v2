@@ -52,11 +52,12 @@
 					clonedSelectedTags.push(tag);
 				}
 
-				$postsInput = { tagIds: clonedTagIds, onlyCurrentUser: true };
+				$postsInput.tagIds = clonedTagIds;
+
 				selectedTags = clonedSelectedTags;
 			}}
 			clearFilter={() => {
-				$postsInput = { tagIds: [], onlyCurrentUser: true };
+				$postsInput.tagIds = [];
 			}}
 			{selectedTags}
 			className="border-t"

@@ -17,7 +17,8 @@
 	let { data }: PageProps = $props();
 
 	const postsInput = writable<PostsInput>({
-		tagIds: []
+		tagIds: [],
+		onlyCurrentUser: false,
 	});
 
 	let triggerMorePostsElement: HTMLElement | null = $state(null);
@@ -54,11 +55,13 @@
 			clonedSelectedTags.push(tag);
 		}
 
-		$postsInput = { tagIds: clonedTagIds };
+		$postsInput.tagIds = clonedTagIds;
+
 		selectedTags = clonedSelectedTags;
 	}}
 	clearFilter={() => {
-		$postsInput = { tagIds: [] };
+		$postsInput.tagIds = [];
+
 		selectedTags = [];
 	}}
 	{selectedTags}

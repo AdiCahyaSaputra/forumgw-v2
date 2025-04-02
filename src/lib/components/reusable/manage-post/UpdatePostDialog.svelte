@@ -76,7 +76,7 @@
 				isAnonymous: data.isAnonymous === 'on',
 				content: data.content as string,
 				groupId,
-        postId: post.id
+				postId: post.id
 			});
 		}
 	});
@@ -136,14 +136,16 @@
 	</form>
 </ResponsiveDialog>
 
-<Button onclick={() => {
-  open = true;
+<Button
+	onclick={() => {
+		open = true;
 
-  $formData.isAnonymous = post.anonymous !== null;
-  $formData.content = post.content;
+		$formData.isAnonymous = post.anonymous !== null;
+		$formData.content = post.content;
 
-  tags = post.tags;
-}}>
+		tags = post.tags;
+	}}
+>
 	<Pencil />
 	Edit
 </Button>

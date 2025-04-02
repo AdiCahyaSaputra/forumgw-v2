@@ -7,6 +7,7 @@
 	import TagFilter from '$lib/components/reusable/discussion/TagFilter.svelte';
 	import type { SelectedTag } from '$lib/constant';
 	import IntersectionObserver from 'svelte-intersection-observer';
+	import { writable } from 'svelte/store';
 
 	type Props = {
 		onTagSelected: (tag: SelectedTag) => void;
@@ -17,13 +18,25 @@
 		className?: string;
 	};
 
-	let { onTagSelected: selectTag, selectedTags, clearFilter, groupId, className, onlyCurrentUser }: Props = $props();
+	let {
+		onTagSelected: selectTag,
+		selectedTags,
+		clearFilter,
+		groupId,
+		className,
+		onlyCurrentUser
+	}: Props = $props();
+
+	let tagsQueryFilter = writable<{
+		groupId?: string;
+		onlyCurrentUser: boolean;
+	}>({
+		groupId: undefined,
+		onlyCurrentUser: false
+	});
 
 	const tags = trpc($page).tag.getAllTags.createInfiniteQuery(
-		{
-			groupId,
-      onlyCurrentUser
-		},
+		tagsQueryFilter,
 		{
 			getNextPageParam: (lastPage) => lastPage.data.nextCursor
 		}
@@ -37,6 +50,14 @@
 		if (!$tags.data) return [];
 
 		return $tags.data.pages.flatMap((page) => page.data.tags);
+	});
+
+	$effect(() => {
+		// Listen to props changes
+		$tagsQueryFilter = {
+			groupId,
+			onlyCurrentUser: onlyCurrentUser || false
+		};
 	});
 </script>
 

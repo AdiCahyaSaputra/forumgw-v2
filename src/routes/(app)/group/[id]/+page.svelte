@@ -22,7 +22,8 @@
 
 	const postsInput = writable<PostsInput>({
 		tagIds: [],
-		groupId: data.params.id
+		groupId: data.params.id,
+		onlyCurrentUser: false,
 	});
 
 	let triggerMorePostsElement: HTMLElement | null = $state(null);
@@ -96,11 +97,11 @@
 				clonedSelectedTags.push(tag);
 			}
 
-			$postsInput = { tagIds: clonedTagIds, groupId: data.params.id };
+			$postsInput.tagIds = clonedTagIds;
 			selectedTags = clonedSelectedTags;
 		}}
 		clearFilter={() => {
-			$postsInput = { tagIds: [], groupId: data.params.id };
+			$postsInput.tagIds = [];
 		}}
 		{selectedTags}
 		groupId={data.params.id}

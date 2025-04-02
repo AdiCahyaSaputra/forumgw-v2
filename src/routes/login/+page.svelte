@@ -33,17 +33,17 @@
 
 	let { data }: Props = $props();
 
-  let disabledForRedirect = $state(false);
+	let disabledForRedirect = $state(false);
 
 	let loginMutate = trpc($page).user.login.createMutation({
 		onSuccess: async (data) => {
-      if(data.status !== 200) {
-        toast.error(data.message || m.global_error_message());
+			if (data.status !== 200) {
+				toast.error(data.message || m.global_error_message());
 
-        return;
-      }
+				return;
+			}
 
-      disabledForRedirect = true;
+			disabledForRedirect = true;
 
 			await goto('/discussion', { replaceState: true });
 		},
@@ -62,7 +62,7 @@
 
 			$loginMutate.mutate(data);
 
-      return false;
+			return false;
 		}
 	});
 

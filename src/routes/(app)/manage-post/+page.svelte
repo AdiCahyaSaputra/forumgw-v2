@@ -3,6 +3,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { Rss, Users } from '@lucide/svelte';
 	import DiscussionSection from '$lib/components/section/manage-post/DiscussionSection.svelte';
+	import GroupSection from '$lib/components/section/manage-post/GroupSection.svelte';
 
 	let { data } = $props();
 </script>
@@ -28,5 +29,7 @@
 	<Tabs.Content value="discussion">
 		<DiscussionSection formEdit={data.formEdit} />
 	</Tabs.Content>
-	<Tabs.Content value="group">Change your password here.</Tabs.Content>
+	<Tabs.Content value="group">
+		<GroupSection formEdit={data.formEdit} />
+	</Tabs.Content>
 </Tabs.Root>
