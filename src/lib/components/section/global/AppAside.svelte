@@ -106,7 +106,7 @@
 				<NavItem {...item} />
 			{/each}
 			<NavItem url="/notification" label={`${1} ${m.nav_item_notification()}`} icon={BellRing} />
-			<NavItem url="/invitation" label={`${1} ${m.nav_item_invite()}`} icon={Mail} />
+			<!-- <NavItem url="/invitation" label={`${1} ${m.nav_item_invite()}`} icon={Mail} /> -->
 		</ul>
 	</div>
 

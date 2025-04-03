@@ -99,5 +99,11 @@
   "post_form_delete_cancel": "Gak Jadi",
   "post_form_report_button": "Liat Pesan Laporan",
   "post_form_report_safe": "Aman kok",
-  "post_form_report_take_down": "Hapus!"
+  "post_form_report_take_down": "Hapus!",
+  "upload_profile_picture_title": "Upload Foto Profil",
+  "upload_profile_picture_description": "Foto profil membuat identitas yang unik untukmu",
+  "upload_profile_picture_delete": "Hapus",
+  "upload_profile_picture_form_title": "Ubah Foto Profil Kamu",
+  "upload_profile_picture_form_description": "PP kok Anime, Kartun, Idol?",
+  "upload_profile_picture_form_submit": "Simpan Perubahan"
 }

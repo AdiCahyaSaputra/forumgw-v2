@@ -15,6 +15,6 @@
 	bind:ref
 	{src}
 	{alt}
-	class={cn("aspect-square size-full", className)}
+	class={cn("aspect-square size-full object-cover object-center", className)}
 	{...restProps}
 />
