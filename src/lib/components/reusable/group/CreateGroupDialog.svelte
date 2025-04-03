@@ -110,7 +110,7 @@
 	</form>
 </ResponsiveDialog>
 
-<Button onclick={() => (open = true)} class="mt-4 lg:w-max w-full">
+<Button onclick={() => (open = true)} class="lg:w-max w-full">
 	<Plus />
 	{m.button_create_group()}
 </Button>

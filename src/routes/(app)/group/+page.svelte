@@ -34,13 +34,14 @@
 
 <svelte:head>
 	<title>Community Group</title>
-	<meta name="description" content="ForumGW Dicussion: Find your community" />
+	<meta name="description" content="ForumGW Groups: Find your community" />
 </svelte:head>
 
 <section class="p-4 border-b">
-	<h1 class="font-bold text-lg">{m.title_user_groups()}</h1>
-
-	<CreateGroupDialog formCreate={data.formCreate} />
+	<div class="flex justify-between items-start lg:flex-row flex-col-reverse gap-2">
+		<h1 class="font-bold text-lg">{m.title_user_groups()}</h1>
+		<CreateGroupDialog formCreate={data.formCreate} />
+	</div>
 
 	<div class="flex gap-4 mt-4">
 		<LoadingState isLoading={$userGroups.isPending}>

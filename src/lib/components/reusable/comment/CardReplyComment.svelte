@@ -1,14 +1,14 @@
 <script lang="ts">
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
-	import * as m from '$lib/paraglide/messages.js';
-	import { timeAgo } from '$lib/utils';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { EllipsisVertical, PencilLine, Trash2 } from '@lucide/svelte';
-	import EditReplyCommentDialog from './EditReplyCommentDialog.svelte';
-	import type { Infer, SuperValidated } from 'sveltekit-superforms';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import * as m from '$lib/paraglide/messages.js';
 	import { replyCommentRequest } from '$lib/trpc/schema/commentSchema';
+	import { timeAgo } from '$lib/utils';
+	import { EllipsisVertical, PencilLine, Trash2 } from '@lucide/svelte';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import DeleteReplyCommentDialog from './DeleteReplyCommentDialog.svelte';
+	import EditReplyCommentDialog from './EditReplyCommentDialog.svelte';
 
 	type Props = {
 		replyComment: {

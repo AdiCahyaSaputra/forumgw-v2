@@ -96,5 +96,8 @@
   "post_form_delete_title": "Hapus Post",
   "post_form_delete_description": "Yakin pengen hapus postingannya?",
   "post_form_delete_submit": "Hapus",
-  "post_form_delete_cancel": "Gak Jadi"
+  "post_form_delete_cancel": "Gak Jadi",
+  "post_form_report_button": "Liat Pesan Laporan",
+  "post_form_report_safe": "Aman kok",
+  "post_form_report_take_down": "Hapus!"
 }

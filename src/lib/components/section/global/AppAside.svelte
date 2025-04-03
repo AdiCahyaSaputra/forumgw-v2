@@ -33,11 +33,11 @@
 			label: m.nav_item_discussion(),
 			icon: Rss
 		},
-		{
-			url: '/group',
-			label: m.nav_item_group(),
-			icon: Users
-		}
+		// {
+		// 	url: '/group',
+		// 	label: m.nav_item_group(),
+		// 	icon: Users
+		// }
 	];
 
 	const navSettingItems = [
@@ -54,12 +54,11 @@
 			label: m.nav_item_manage_post(),
 			icon: GanttChartSquare
 		},
-
-		{
-			url: '/manage-group',
-			label: m.nav_item_manage_group(),
-			icon: CircleDashed
-		}
+		// {
+		// 	url: '/manage-group',
+		// 	label: m.nav_item_manage_group(),
+		// 	icon: CircleDashed
+		// }
 	];
 
 	let { user }: Props = $props();

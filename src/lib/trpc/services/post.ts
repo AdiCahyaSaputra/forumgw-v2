@@ -5,14 +5,7 @@ import { anonymous, comments, posts, reports, tagPosts, tags, users } from '$lib
 import { sendTRPCResponse } from '$lib/utils';
 import { and, eq, inArray, isNull, lt, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import type {
-	createPostRequest,
-	deletePostRequest,
-	editPostRequest,
-	getPublicPostDiscussionsRequest,
-	reportPostRequest
-} from '../schema/postSchema';
-import { getPostDetailRequest } from './../schema/postSchema';
+import { createPostRequest, deletePostRequest, editPostRequest, getPostDetailRequest, getPublicPostDiscussionsRequest, reportPostRequest } from './../schema/postSchema';
 import type { UserPayload } from './user';
 
 export const getPublicPostDiscussions = async (
@@ -449,7 +442,9 @@ export const deletePost = async (input: z.infer<typeof deletePostRequest>, user:
 			.delete(posts)
 			.where(and(...conditions))
 			.then(() => sendTRPCResponse({ status: 200, message: 'ok' }))
-			.catch((err) => sendTRPCResponse({ status: 500, message: m.global_error_message() }, { err }));
+			.catch((err) =>
+				sendTRPCResponse({ status: 500, message: m.global_error_message() }, { err })
+			);
 
 		return result;
 	} catch (err) {
@@ -486,4 +481,90 @@ export const reportPost = async (input: z.infer<typeof reportPostRequest>) => {
 		);
 
 	return result;
+};
+
+export const getReportedPost = async (
+	user: UserPayload
+) => {
+	if(user.role !== 'developer') {
+		return sendTRPCResponse({
+			status: 403,
+			message: 'You are not developer'
+		}, []);
+	}
+
+	const conditions = [];
+
+	const reportPostIds = await db.select({ postId: reports.postId }).from(reports);
+	const postIds = reportPostIds.map((report) => report.postId);
+
+	conditions.push(inArray(posts.id, postIds));
+
+	const results = await db
+		.select({
+			id: posts.id,
+			content: posts.content,
+			createdAt: posts.createdAt,
+			user: sql<null | { name: string; username: string; image: string | null }>`
+        CASE 
+          WHEN ${posts.userId} IS NULL THEN NULL
+          ELSE jsonb_build_object(
+            'name', ${users.name},
+            'username', ${users.username},
+            'image', ${users.image}
+          )
+        END
+      `.as('user'),
+			anonymous: sql<null | { name: string; username: string }>`
+        CASE 
+          WHEN ${posts.anonymousId} IS NULL THEN NULL
+          ELSE jsonb_build_object(
+            'name', 'Anonymous',
+            'username', '@0x0'
+          )
+        END
+      `.as('anonymous'),
+			tags: sql<string[]>`
+          COALESCE(
+            array_agg(DISTINCT ${tags.name})
+            FILTER (WHERE ${tags.name} IS NOT NULL),
+            '{}'
+          )
+      `.as('tags'), // '{}' would be translated to empty array [] on JS
+			_count: {
+				comment: sql<number>`
+        (
+          SELECT COUNT(*) 
+          FROM ${comments} 
+          WHERE ${comments.postId} = ${posts.id}
+        )
+      `.as('comment_count')
+			}
+		})
+		.from(posts)
+		.leftJoin(tagPosts, eq(posts.id, tagPosts.postId))
+		.leftJoin(users, eq(posts.userId, users.id))
+		.leftJoin(anonymous, eq(posts.anonymousId, anonymous.id))
+		.leftJoin(tags, eq(tagPosts.tagId, tags.id))
+		.where(and(...conditions))
+		.groupBy(
+			// Include Non-Aggregated Column or ERROR
+			posts.id,
+			posts.userId,
+			posts.anonymousId,
+			posts.content,
+			posts.createdAt,
+			users.name,
+			users.username,
+			users.image
+		)
+		.orderBy(sql`created_at DESC`)
+
+	return sendTRPCResponse(
+		{
+			status: results.length > 0 ? 200 : 404,
+			message: 'ok'
+		},
+		results
+	);
 };

@@ -28,10 +28,11 @@
 				comment: number;
 			};
 		};
-    extraActions?: Snippet
+		extraActions?: Snippet;
+		customActions?: Snippet;
 	};
 
-	const { post, extraActions }: Props = $props();
+	const { post, extraActions, customActions }: Props = $props();
 </script>
 
 <div class="border-b">
@@ -76,17 +77,21 @@
 	</div>
 
 	<div class="px-4 pb-4 flex gap-1">
-		<Button
-			onclick={() => {
-				goto(`/discussion/${post.id}`);
-			}}
-			variant="outline"
-		>
-			<MessageSquare />
-			<span>{post._count.comment}</span>
-		</Button>
-		<ReportPostDialog id={post.id} />
+		{#if customActions}
+			{@render customActions()}
+		{:else}
+			<Button
+				onclick={() => {
+					goto(`/discussion/${post.id}`);
+				}}
+				variant="outline"
+			>
+				<MessageSquare />
+				<span>{post._count.comment}</span>
+			</Button>
+			<ReportPostDialog id={post.id} />
+		{/if}
 
-    {@render extraActions?.()}
+		{@render extraActions?.()}
 	</div>
 </div>

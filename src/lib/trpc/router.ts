@@ -5,13 +5,15 @@ import { post } from './routes/post';
 import { tag } from './routes/tag';
 import { user } from './routes/user';
 import { group } from './routes/group';
+import { report } from './routes/report';
 
 export const router = t.router({
 	user,
 	post,
 	tag,
 	comment,
-  group
+  group,
+	report
 });
 
 export const createCaller = t.createCallerFactory(router);

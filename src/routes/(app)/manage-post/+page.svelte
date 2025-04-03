@@ -20,16 +20,16 @@
 				<Rss class="w-4 aspect-square" />
 				<span>{m.nav_item_discussion()}</span>
 			</Tabs.Trigger>
-			<Tabs.Trigger value="group" class="gap-2">
+			<!-- <Tabs.Trigger value="group" class="gap-2">
 				<Users class="w-4 aspect-square" />
 				<span>{m.nav_item_group()}</span>
-			</Tabs.Trigger>
+			</Tabs.Trigger> -->
 		</Tabs.List>
 	</div>
 	<Tabs.Content value="discussion">
 		<DiscussionSection formEdit={data.formEdit} />
 	</Tabs.Content>
-	<Tabs.Content value="group">
+	<!-- <Tabs.Content value="group">
 		<GroupSection formEdit={data.formEdit} />
-	</Tabs.Content>
+	</Tabs.Content> -->
 </Tabs.Root>

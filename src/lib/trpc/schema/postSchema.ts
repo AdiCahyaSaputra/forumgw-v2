@@ -45,3 +45,7 @@ export const reportPostRequest = z.object({
   reason: z.string().optional().default('-'),
   id: z.string()
 });
+
+export const getReportedPostRequest = z.object({
+  cursor: z.string().optional()
+})

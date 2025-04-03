@@ -7,11 +7,12 @@
 		description?: string;
 		cancel: string;
 		submit: string;
+		onCancel: () => void;
 		onSubmit: () => void;
 		isPending: boolean;
 	};
 
-	let { open = $bindable(false), title, description, cancel, submit, onSubmit, isPending }: Props = $props();
+	let { open = $bindable(false), title, description, cancel, submit, onCancel, onSubmit, isPending }: Props = $props();
 </script>
 
 <AlertDialog.Root bind:open>
@@ -23,7 +24,7 @@
 			{/if}
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel>{cancel}</AlertDialog.Cancel>
+			<AlertDialog.Cancel onclick={onCancel}>{cancel}</AlertDialog.Cancel>
 			<AlertDialog.Action disabled={isPending} onclick={onSubmit}>{submit}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
