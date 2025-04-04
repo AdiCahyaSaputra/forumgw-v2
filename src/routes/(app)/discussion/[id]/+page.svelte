@@ -12,6 +12,7 @@
 	import type { PageProps } from './$types';
 
 	const { data }: PageProps = $props();
+
 	const commentsFilter = writable({
 		postId: data.params.id
 	});
@@ -28,7 +29,7 @@
 		if(isIntersecting) {
 			$comments.fetchNextPage();
 		}
-	})
+	});
 </script>
 
 <svelte:head>
@@ -61,13 +62,15 @@
 	{#if $comments.data}
 		<div class="p-4 flex flex-col space-y-4">
 			{#each $comments.data.pages.flatMap((page) => page.data.comments) as comment (comment.id)}
-				<CardComment 
+        <CardComment 
           {comment} 
 
           formEditComment={data.formEditComment} 
 
           formReplyComment={data.formReplyComment} 
           formEditReplyComment={data.formEditReplyComment} 
+
+          openReply={+(data.cid ?? '-1') === comment.id}
         />
 			{/each}
 

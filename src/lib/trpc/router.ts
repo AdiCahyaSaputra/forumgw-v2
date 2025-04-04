@@ -6,6 +6,7 @@ import { tag } from './routes/tag';
 import { user } from './routes/user';
 import { group } from './routes/group';
 import { report } from './routes/report';
+import { notification } from './routes/notifications';
 
 export const router = t.router({
 	user,
@@ -13,7 +14,8 @@ export const router = t.router({
 	tag,
 	comment,
   group,
-	report
+	report,
+  notification
 });
 
 export const createCaller = t.createCallerFactory(router);

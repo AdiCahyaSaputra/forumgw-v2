@@ -19,7 +19,8 @@ export const load: PageServerLoad = async (event) => {
     formEditReplyComment: await superValidate(zod(replyCommentRequest())),
 
     params: event.params,
-    user: (await event.parent()).user
+    user: (await event.parent()).user,
+    cid: event.url.searchParams.get('cid')
   };
 };
 

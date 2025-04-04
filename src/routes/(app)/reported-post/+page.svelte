@@ -70,12 +70,11 @@
 	<meta name="description" content="ForumGW Reported Post: Manage users reported posts" />
 </svelte:head>
 
-<section>
-	<div class="p-4 border-b flex gap-4 items-center">
-		<Siren class="fill-white stroke-destructive w-8 h-8" />
-		<h1 class="text-lg font-bold">Reported Post</h1>
-	</div>
+<div class="p-4 border-b sticky top-0 bg-white">
+  <h1 class="text-lg font-bold">Reported Post</h1>
+</div>
 
+<section>
 	<LoadingState isLoading={$reportedPost.isPending}>
 		{#snippet loadingFallback()}
 			<div class="w-full py-20 bg-secondary rounded-md"></div>

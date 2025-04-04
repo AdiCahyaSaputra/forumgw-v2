@@ -51,8 +51,8 @@
 			<div>
 				{#if post.user}
 					<h3 class="text-sm leading-none font-bold">{post.user.name}</h3>
-					<a href={`/profile/${post.user.username}`} class="text-sm hover:underline">
-						{post.user.username}
+					<a href={`/profile/${post.user.username}`} class="text-sm hover:text-red-600">
+						@{post.user.username}
 					</a>
 				{:else if post.anonymous}
 					<h3 class="text-sm leading-none font-bold">{post.anonymous.name}</h3>

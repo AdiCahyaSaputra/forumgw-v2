@@ -21,7 +21,7 @@
   "change_lang_hint": "#GantiBahasaAjaDulu",
   "nav_title_category": "Kategori Diskusi",
   "nav_title_dashboard": "Dashboard",
-  "nav_title_setting": "Pengaturan",
+  "nav_title_setting": "Personalisasi",
   "nav_item_discussion": "Diskusi",
   "nav_item_group": "Grup Komunitas",
   "nav_item_manage_post": "Kelola Post",
@@ -105,5 +105,10 @@
   "upload_profile_picture_delete": "Hapus",
   "upload_profile_picture_form_title": "Ubah Foto Profil Kamu",
   "upload_profile_picture_form_description": "PP kok Anime, Kartun, Idol?",
-  "upload_profile_picture_form_submit": "Simpan Perubahan"
+  "upload_profile_picture_form_submit": "Simpan Perubahan",
+  "notif_message_type_comment": "Mengomentari postinganmu",
+  "notif_message_type_reply": "Membalas komentarmu",
+  "notif_message_type_report": "Melaporkan postingan yang kamu publish",
+  "notif_message_type_mention": "Menyebut dirimu di komentar",
+  "notif_mark_all_read": "Tandai dibaca semua"
 }

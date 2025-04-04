@@ -22,6 +22,8 @@
 	import { toast } from 'svelte-sonner';
 	import { afterNavigate, goto } from '$app/navigation';
 	import type { UserPayload } from '$lib/trpc/services/user.js';
+  import {trpc} from '$lib/trpc/client';
+  import { page } from '$app/stores';
 
 	type Props = {
 		user: UserPayload | null;
@@ -40,14 +42,6 @@
 		// }
 	];
 
-	const navSettingItems = [
-		{
-			url: '/account',
-			label: m.nav_item_account(),
-			icon: User
-		}
-	];
-
 	const navDashboardItems = [
 		{
 			url: '/manage-post',
@@ -61,11 +55,21 @@
 		// }
 	];
 
+	const navSettingItems = [
+		{
+			url: '/account',
+			label: m.nav_item_account(),
+			icon: User
+		}
+	];
+
 	let { user }: Props = $props();
 
 	let openAside = $state(false);
 	let isLoggingOut = $state(false);
 	let formResult: ActionResult | null = $state(null);
+
+  let notification = trpc($page).notification.getUserNotificationCounts.createQuery();
 
 	afterNavigate(() => {
 		openAside = false;
@@ -105,7 +109,7 @@
 			{#each navSettingItems as item, idx (idx)}
 				<NavItem {...item} />
 			{/each}
-			<NavItem url="/notification" label={`${1} ${m.nav_item_notification()}`} icon={BellRing} />
+			<NavItem url="/notification" label={`${$notification.data?.data.count || ''} ${m.nav_item_notification()}`} icon={BellRing} />
 			<!-- <NavItem url="/invitation" label={`${1} ${m.nav_item_invite()}`} icon={Mail} /> -->
 		</ul>
 	</div>

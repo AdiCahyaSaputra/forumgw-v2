@@ -450,7 +450,8 @@ export const replyComment = async (
           userId: user.id,
           toUser: authorId,
           isRead: false,
-          type: NotificationType.reply
+          type: NotificationType.reply,
+          commentId: comment.id
         });
       }
 

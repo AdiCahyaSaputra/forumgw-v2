@@ -84,7 +84,7 @@
 		<Card class="w-max border-none shadow-none rounded-none">
 			<CardHeader class="p-0">
 				<CardTitle class="text-xl flex flex-col gap-2" level={1}>
-					<div class="bg-foreground/5 rounded-md p-4 w-max">
+					<div class="bg-foreground/3 border rounded-md p-4 w-max">
 						<Users />
 					</div>
 					<br />

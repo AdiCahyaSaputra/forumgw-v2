@@ -21,7 +21,7 @@
   "change_lang_hint": "Change language",
   "nav_title_category": "Discussion Category",
   "nav_title_dashboard": "Dashboard",
-  "nav_title_setting": "Setting",
+  "nav_title_setting": "Personalization",
   "nav_item_discussion": "Discussion",
   "nav_item_group": "Community Group",
   "nav_item_manage_post": "Manage Post",
@@ -105,5 +105,10 @@
   "upload_profile_picture_delete": "Delete",
   "upload_profile_picture_form_title": "Change Your Profile Picture",
   "upload_profile_picture_form_description": "Why using Anime, Cartoon, Idol as your Profile Picture?",
-  "upload_profile_picture_form_submit": "Save Change"
+  "upload_profile_picture_form_submit": "Save Change",
+  "notif_message_type_comment": "Comment on your post",
+  "notif_message_type_reply": "Reply your comment",
+  "notif_message_type_report": "Reporting your post",
+  "notif_message_type_mention": "Mentioing you on their comments",
+  "notif_mark_all_read": "Mark as readed"
 }

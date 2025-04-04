@@ -48,6 +48,8 @@
 				case 'success':
 					trpcClientUtils($page).comment.getPostComments.invalidate();
 
+          // TODO: Trigger notification change using tRPC SSE (Server Send Event)
+
 					openEditComment = false;
 					break;
 				default:

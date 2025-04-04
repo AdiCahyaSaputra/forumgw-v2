@@ -54,6 +54,8 @@
 				case 'success':
 					trpcClientUtils($page).comment.getReplyComments.invalidate();
 
+          // TODO: Trigger notification change using tRPC SSE (Server Send Event)
+
 					open = false;
 					break;
 				default:

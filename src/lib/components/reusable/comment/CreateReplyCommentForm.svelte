@@ -65,6 +65,8 @@
 
 			trpcClientUtils($page).comment.getPostComments.invalidate();
       $replies.refetch();
+
+      // TODO: Trigger notification change using tRPC SSE (Server Send Event)
 		},
 		onUpdate: async ({ result }) => {
 			if (result.type !== 'success') {

@@ -35,6 +35,8 @@
 
 		formReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
 		formEditReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
+
+    openReply: boolean;
 	};
 
 	const {
@@ -42,15 +44,27 @@
 		formEditComment,
 
 		formReplyComment,
-		formEditReplyComment
+		formEditReplyComment,
+
+    openReply
 	}: Props = $props();
 
-	let openReplyComment = $state(false);
+	let openReplyComment = $state(openReply);
 	let openEditComment = $state(false);
 	let openDeleteComment = $state(false);
+
+  $effect(() => {
+    if(openReply) {
+      const element = document.getElementById(`${comment.id}`);
+
+      if(!element) return;
+
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
 </script>
 
-<div class={['rounded-md border', openReplyComment && 'border-primary']}>
+<div id="{comment.id.toString()}" class={['rounded-md border', openReplyComment && 'border-primary']}>
 	<div class="flex justify-between items-start p-4 pb-2">
 		<div class="flex items-start gap-2">
 			<Avatar.Root class="rounded-md border m-0">
