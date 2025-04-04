@@ -8,7 +8,7 @@ import { isGroupMemberCheck } from './group';
 import type { UserPayload } from './user';
 
 export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>, user: UserPayload) => {
-  const { groupId, cursor, name, onlyCurrentUser } = input;
+  const { groupId, cursor, name, onlyCurrentUser, userId } = input;
 
   const condition = [];
 
@@ -36,6 +36,13 @@ export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>, user:
 
   if (cursor) {
     condition.push(gt(tags.id, cursor));
+  }
+
+  console.log(userId, " from tag");
+
+  if (userId) {
+    condition.push(eq(posts.userId, userId));
+    console.log(userId, " from tag inside userID exists");
   }
 
   if (onlyCurrentUser) {
@@ -77,6 +84,7 @@ export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>, user:
       tags: allTags,
       nextCursor,
       hasNextPage
-    }
+		}
 	);
 };
+  

@@ -7,6 +7,6 @@ export const load: LayoutServerLoad = async (event) => {
   event.depends("app:currentUser");
 
 	return {
-		user
+		user,
 	};
 };

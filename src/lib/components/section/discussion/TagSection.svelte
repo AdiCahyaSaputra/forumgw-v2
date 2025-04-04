@@ -15,6 +15,7 @@
 		selectedTags: SelectedTag[];
 		onlyCurrentUser?: boolean;
 		groupId?: string;
+		userId?: string;
 		className?: string;
 	};
 
@@ -24,15 +25,18 @@
 		clearFilter,
 		groupId,
 		className,
-		onlyCurrentUser
+		onlyCurrentUser,
+    userId
 	}: Props = $props();
 
 	let tagsQueryFilter = writable<{
 		groupId?: string;
-		onlyCurrentUser: boolean;
+    userId?: string;
+		onlyCurrentUser?: boolean,
 	}>({
 		groupId: undefined,
-		onlyCurrentUser: false
+    userId,
+    onlyCurrentUser: onlyCurrentUser || false
 	});
 
 	const tags = trpc($page).tag.getAllTags.createInfiniteQuery(
@@ -56,12 +60,13 @@
 		// Listen to props changes
 		$tagsQueryFilter = {
 			groupId,
-			onlyCurrentUser: onlyCurrentUser || false
+      userId,
+			onlyCurrentUser: onlyCurrentUser || false,
 		};
 	});
 </script>
 
-<TagFilter bind:open={openFilter} {selectTag} {groupId} />
+<TagFilter bind:open={openFilter} {selectTag} {groupId} {userId} />
 
 <div class={['border-b sticky top-0 z-10 bg-white', className]}>
 	<div class="relative h-full p-8">

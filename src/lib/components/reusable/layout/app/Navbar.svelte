@@ -14,7 +14,7 @@
 
 		<div class="flex gap-4">
 			<LangSwitcher />
-			<a href={`/profil/${user?.username}`}>
+			<a href={`/profile/${user?.username}`}>
 				<Avatar.Root class="cursor-pointer rounded-md">
 					<Avatar.Image src={user?.image} alt="Profile Image" />
 					<Avatar.Fallback>{user?.username[0].toUpperCase()}</Avatar.Fallback>

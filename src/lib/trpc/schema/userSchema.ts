@@ -36,3 +36,7 @@ export const editUserRequest = (
       .optional()
       .default(user ? (user.image ?? '') : ''),
   });
+
+export const getUserProfileRequest = z.object({
+  username: z.string()
+});

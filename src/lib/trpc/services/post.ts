@@ -12,7 +12,7 @@ export const getPublicPostDiscussions = async (
 	input: z.infer<ReturnType<typeof getPublicPostDiscussionsRequest>>,
 	user: UserPayload
 ) => {
-	const { tagIds, cursor, groupId, onlyCurrentUser } = input;
+	const { tagIds, cursor, groupId, onlyCurrentUser, userId } = input;
 
 	const limit = 10;
 	const conditions = [];
@@ -46,6 +46,10 @@ export const getPublicPostDiscussions = async (
 	if (onlyCurrentUser) {
 		conditions.push(or(eq(posts.userId, user.id), eq(anonymous.userId, user.id)));
 	}
+
+  if(userId) {
+    conditions.push(eq(posts.userId, userId));
+  }
 
 	if (cursor) {
 		conditions.push(lt(posts.id, cursor));

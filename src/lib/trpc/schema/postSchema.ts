@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const getPublicPostDiscussionsRequest = () =>
   z.object({
     groupId: z.string().optional(),
+    userId: z.string().optional(),
     onlyCurrentUser: z.boolean().optional().default(false),
     tagIds: z.array(z.number()).default([]),
     cursor: z.string().optional()

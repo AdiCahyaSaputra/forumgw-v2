@@ -5,9 +5,9 @@
 	import { writable } from 'svelte/store';
 	import TagItem from '$lib/components/reusable/discussion/TagItem.svelte';
 
-	let { open = $bindable(false), selectTag, groupId } = $props();
+	let { open = $bindable(false), selectTag, groupId, userId } = $props();
 
-	let tagFilter = writable({ name: '', groupId });
+	let tagFilter = writable({ name: '', groupId, userId });
 	let tags = trpc($page).tag.getAllTags.createQuery(tagFilter);
 
 	let filteredTags = $derived.by(() => {
@@ -24,8 +24,6 @@
 
     return data;
 	});
-
-  $inspect(filteredTags);
 </script>
 
 <Command.Dialog bind:open shouldFilter={false}>

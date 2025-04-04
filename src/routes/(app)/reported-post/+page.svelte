@@ -3,7 +3,6 @@
 	import { page } from '$app/stores';
 	import LoadingState from '$lib/components/reusable/global/LoadingState.svelte';
 	import CardPost from '$lib/components/reusable/discussion/CardPost.svelte';
-	import { Siren } from '@lucide/svelte';
 	import { Button } from '$lib/components/ui/button';
 	import ConfirmDialog from '$lib/components/reusable/global/ConfirmDialog.svelte';
 	import { writable } from 'svelte/store';
