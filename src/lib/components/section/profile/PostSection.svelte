@@ -35,7 +35,6 @@
 	});
 </script>
 
-<!-- TODO: still bug, it cant query userId for tags -->
 <section class="h-[20000px]">
 	<div class="relative">
 		<TagSection

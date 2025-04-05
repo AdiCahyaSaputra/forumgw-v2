@@ -38,11 +38,8 @@ export const getAllTags = async (input: z.infer<typeof getAllTagsRequest>, user:
     condition.push(gt(tags.id, cursor));
   }
 
-  console.log(userId, " from tag");
-
   if (userId) {
     condition.push(eq(posts.userId, userId));
-    console.log(userId, " from tag inside userID exists");
   }
 
   if (onlyCurrentUser) {

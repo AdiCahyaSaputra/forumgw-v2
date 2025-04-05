@@ -43,7 +43,7 @@
 		<UploadPpFormSection 
       bind:open
       user={data.user} 
-      onClientUploadComplete={(imageUrl) => {
+      onClientUploadComplete={(imageUrl: string) => {
         $userMutate.mutate({ ...data.user, avatar: imageUrl });
       }}
     />

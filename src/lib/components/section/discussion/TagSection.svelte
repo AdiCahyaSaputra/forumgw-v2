@@ -3,7 +3,7 @@
 	import LoadingState from '$lib/components/reusable/global/LoadingState.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { trpc } from '$lib/trpc/client';
-	import { Eraser, Search } from '@lucide/svelte';
+	import { Eraser, Search, X } from '@lucide/svelte';
 	import TagFilter from '$lib/components/reusable/discussion/TagFilter.svelte';
 	import type { SelectedTag } from '$lib/constant';
 	import IntersectionObserver from 'svelte-intersection-observer';
@@ -90,6 +90,7 @@
 							<span class="text-red-600 font-bold">#</span>
 							{tag.name}
 							<span class="font-bold">{tag._count.post}</span>
+							<X />
 						</Button>
 					{/each}
 					{#each tagItems as tag, idx (idx)}
@@ -118,7 +119,7 @@
 				{/if}
 			</LoadingState>
 		</div>
-		<div class="absolute inset-y-0 right-0 bg-white p-4 border-l flex gap-2">
+		<div class="absolute inset-y-0 right-0 bg-white p-4 flex gap-2">
 			<Button variant="outline" size="icon" onclick={clearFilter}>
 				<Eraser />
 			</Button>

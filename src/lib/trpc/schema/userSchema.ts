@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { UserPayload } from '../services/user';
 import * as m from '$lib/paraglide/messages.js';
 
 export const getUserForMentioningRequest = z.object({
@@ -12,7 +11,7 @@ export const getUserForInviteRequest = z.object({
 });
 
 export const editUserRequest = (
-  user: UserPayload | null
+  user: { name: string; username: string; bio: string | null; avatar: string | null; } | null
 ) =>
   z.object({
     name: z
@@ -34,7 +33,7 @@ export const editUserRequest = (
       .string()
       .nullable()
       .optional()
-      .default(user ? (user.image ?? '') : ''),
+      .default(user ? (user.avatar ?? '') : ''),
   });
 
 export const getUserProfileRequest = z.object({

@@ -110,5 +110,6 @@
   "notif_message_type_reply": "Reply your comment",
   "notif_message_type_report": "Reporting your post",
   "notif_message_type_mention": "Mentioing you on their comments",
-  "notif_mark_all_read": "Mark as readed"
+  "notif_mark_all_read": "Mark as readed",
+  "profile_digital_footprints": "Digital Footprint"
 }

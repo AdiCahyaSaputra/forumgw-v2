@@ -123,11 +123,15 @@ export const verifyUserToken = async (
 
         if (newToken && newRefreshToken) {
           event.cookies.set('TOKEN', newToken, {
+            httpOnly: true,
+            secure: true,
             expires: new Date(Date.now() + 2 * (60 * 60 * 1000)),
             path: '/'
           });
 
           event.cookies.set('REFRESH_TOKEN', newRefreshToken, {
+            httpOnly: true,
+            secure: true,
             expires: new Date(Date.now() + 24 * (60 * 60 * 1000)),
             path: '/'
           });

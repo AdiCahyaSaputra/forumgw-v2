@@ -6,6 +6,7 @@
 	import { page } from '$app/stores';
 	import LoadingState from '$lib/components/reusable/global/LoadingState.svelte';
 	import PostSection from '$lib/components/section/profile/PostSection.svelte';
+  import * as m from '$lib/paraglide/messages.js';
 
 	let openPreviewImage = $state(false);
 
@@ -32,7 +33,7 @@
 	<div>
 		<div
 			class="w-[300px] h-[300px] bg-muted bg-cover bg-center border"
-			style="background-image: url({$user.data?.data.image})"
+			style="background-image: url({$user.data?.data?.image})"
 		></div>
 		<Button class="mt-2" onclick={() => (openPreviewImage = false)}>Tutup</Button>
 	</div>
@@ -44,8 +45,8 @@
 			class="cursor-pointer rounded-md w-[80px] h-[80px]"
 			onclick={() => (openPreviewImage = true)}
 		>
-			<Avatar.Image src={$user.data?.data.image} alt="Profile Image" />
-			<Avatar.Fallback>{$user.data?.data.username[0].toUpperCase()}</Avatar.Fallback>
+			<Avatar.Image src={$user.data?.data?.image} alt="Profile Image" />
+			<Avatar.Fallback>{$user.data?.data?.username[0].toUpperCase()}</Avatar.Fallback>
 		</Avatar.Root>
 		<div>
 			<LoadingState isLoading={$user.isPending}>
@@ -56,17 +57,17 @@
 
 				{#if $user.data}
 					<h4 class="text-lg font-bold">
-						{$user.data.data.name}
+						{$user.data.data?.name}
 					</h4>
 					<p class="text-red-600 font-bold">
-						@{$user.data.data.username}
+						@{$user.data.data?.username}
 					</p>
 				{/if}
 			</LoadingState>
 		</div>
 	</div>
 	<div class="flex justify-end items-center gap-4">
-		<div class="grow h-px bg-primary mt-[5px]" />
+		<div class="grow h-px bg-primary mt-[5px]"></div>
 		<p class="font-bold">
 			Bio <span class="text-red-600">Gw</span>
 		</p>
@@ -77,18 +78,18 @@
 		{/snippet}
 
 		<p class="text-foreground/60 w-[80%]">
-			{$user.data?.data.bio ?? 'No Bio'}
+			{$user.data?.data?.bio ?? 'No Bio'}
 		</p>
 	</LoadingState>
 
 	<div class="flex gap-4 mt-4">
 		<p class="font-bold">
-			Jejak Digital <span class="text-red-600">Gw</span>
+			{m.profile_digital_footprints()} <span class="text-red-600">Gw</span>
 		</p>
 		<div class="translate-y-[50%] grow bg-transparent border-t border-t-primary"></div>
 	</div>
 </section>
 
 {#if $user.data}
-	<PostSection userId={$user.data.data.id} />
+	<PostSection userId={$user.data.data?.id} />
 {/if}
