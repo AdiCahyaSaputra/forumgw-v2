@@ -23,7 +23,8 @@
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-  import { trpc } from '$lib/trpc/client';
+	import { trpc } from '$lib/trpc/client';
+	import { z } from 'zod';
 
 	type Props = {
 		data: {
@@ -36,7 +37,13 @@
 	let disabledForRedirect = $state(false);
 
 	let registerMutate = trpc($page).user.register.createMutation({
-		onSuccess: async () => {
+		onSuccess: async (data) => {
+			if (data.status !== 201) {
+				toast.error(data.message || m.global_error_message());
+
+				return;
+			}
+
 			disabledForRedirect = true;
 
 			await goto('/login', { replaceState: true });
