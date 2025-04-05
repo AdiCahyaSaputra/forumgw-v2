@@ -10,7 +10,7 @@ import {
   replyComments,
   users
 } from '$lib/server/db/schema';
-import { sendTRPCResponse } from '$lib/utils';
+import { BadWordFilter, sendTRPCResponse } from '$lib/utils';
 import { and, desc, eq, lt, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type {
@@ -151,7 +151,8 @@ export const createComment = async (
   input: z.infer<ReturnType<typeof commentRequest>>,
   user: UserPayload
 ) => {
-  const { text, postId, mentionUsers, groupId } = input;
+  const { text: unfilteredTextComment, postId, mentionUsers, groupId } = input;
+  const text = BadWordFilter(unfilteredTextComment);
 
   const mentionedUserIds = mentionUsers?.split(',');
   let memberGroupIds: string[] = [];
@@ -260,7 +261,8 @@ export const editComment = async (
   input: z.infer<ReturnType<typeof commentRequest>>,
   user: UserPayload
 ) => {
-  const { text, postId, mentionUsers, groupId, commentId } = input;
+  const { text: unfilteredTextComment, postId, mentionUsers, groupId, commentId } = input;
+  const text = BadWordFilter(unfilteredTextComment);
 
   if (!commentId) {
     return sendTRPCResponse({
@@ -392,7 +394,8 @@ export const replyComment = async (
   input: z.infer<ReturnType<typeof replyCommentRequest>>,
   user: UserPayload
 ) => {
-  const { text, commentId, mentionUsers, groupId } = input;
+  const { text: unfilteredTextComment, commentId, mentionUsers, groupId } = input;
+  const text = BadWordFilter(unfilteredTextComment);
 
   const mentionedUserIds = mentionUsers?.split(',');
   let memberGroupIds: string[] = [];
@@ -500,7 +503,8 @@ export const editReplyComment = async (
   input: z.infer<ReturnType<typeof replyCommentRequest>>,
   user: UserPayload
 ) => {
-  const { text, commentId, mentionUsers, groupId, replyCommentId } = input;
+  const { text: unfilteredTextComment, commentId, mentionUsers, groupId, replyCommentId } = input;
+  const text = BadWordFilter(unfilteredTextComment);
 
   if (!replyCommentId) {
     return sendTRPCResponse({

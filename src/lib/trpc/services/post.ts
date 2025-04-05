@@ -2,10 +2,17 @@ import { isGroupMemberCheck } from './group';
 import * as m from '$lib/paraglide/messages.js';
 import { db } from '$lib/server/db';
 import { anonymous, comments, posts, reports, tagPosts, tags, users } from '$lib/server/db/schema';
-import { sendTRPCResponse } from '$lib/utils';
+import { sendTRPCResponse, BadWordFilter } from '$lib/utils';
 import { and, eq, inArray, isNull, lt, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { createPostRequest, deletePostRequest, editPostRequest, getPostDetailRequest, getPublicPostDiscussionsRequest, reportPostRequest } from './../schema/postSchema';
+import {
+	createPostRequest,
+	deletePostRequest,
+	editPostRequest,
+	getPostDetailRequest,
+	getPublicPostDiscussionsRequest,
+	reportPostRequest
+} from './../schema/postSchema';
 import type { UserPayload } from './user';
 
 export const getPublicPostDiscussions = async (
@@ -47,9 +54,9 @@ export const getPublicPostDiscussions = async (
 		conditions.push(or(eq(posts.userId, user.id), eq(anonymous.userId, user.id)));
 	}
 
-  if(userId) {
-    conditions.push(eq(posts.userId, userId));
-  }
+	if (userId) {
+		conditions.push(eq(posts.userId, userId));
+	}
 
 	if (cursor) {
 		conditions.push(lt(posts.id, cursor));
@@ -212,7 +219,11 @@ export const createNewPost = async (
 	input: z.infer<ReturnType<typeof createPostRequest>>,
 	user: UserPayload
 ) => {
-	const { isAnonymous, content, tags: tagsName, groupId } = input;
+	const { isAnonymous, content: unfilteredPostContent, tags: unfilteredTagsName, groupId } = input;
+	const content = BadWordFilter(unfilteredPostContent);
+	const tagsName = unfilteredTagsName.map((tagName) => BadWordFilter(tagName));
+
+	console.log(unfilteredPostContent, content, tagsName);
 
 	if (groupId) {
 		const isGroupMember = await isGroupMemberCheck(groupId, user);
@@ -307,7 +318,9 @@ export const editPost = async (
 	input: z.infer<ReturnType<typeof editPostRequest>>,
 	user: UserPayload
 ) => {
-	const { isAnonymous, content, tags: tagsName, groupId, postId } = input;
+	const { isAnonymous, content: unfilteredPostContent, tags: unfilteredTagsName, groupId, postId } = input;
+	const content = BadWordFilter(unfilteredPostContent);
+	const tagsName = unfilteredTagsName.map((tagName) => BadWordFilter(tagName));
 
 	if (groupId) {
 		const isGroupMember = await isGroupMemberCheck(groupId, user);
@@ -333,8 +346,10 @@ export const editPost = async (
 				.where(eq(anonymous.userId, user.id))
 				.limit(1);
 
-			// If the post is already anonymous, then we need to verify for authorizing edit action
-			anonymousUserId = isAnonymousUserExists[0]?.id;
+			if(isAnonymousUserExists[0]) {
+				// If the post is already anonymous, then we need to verify for authorizing edit action
+				anonymousUserId = isAnonymousUserExists[0]?.id;
+			}
 
 			if (isAnonymous) {
 				// User want to change this post to anonymous post, but the user didn't have anonymous user yet
@@ -348,7 +363,9 @@ export const editPost = async (
 				}
 			}
 
-			authorizedPost.push(eq(posts.anonymousId, anonymousUserId));
+			if(anonymousUserId) {
+				authorizedPost.push(eq(posts.anonymousId, anonymousUserId));
+			}
 
 			conditions.push(or(...authorizedPost)); // Authorize who edit the post
 
@@ -439,7 +456,10 @@ export const deletePost = async (input: z.infer<typeof deletePostRequest>, user:
 			.where(eq(anonymous.userId, user.id))
 			.limit(1);
 
-		authorizedPost.push(eq(posts.anonymousId, isAnonymousUserExists[0]?.id));
+		if(isAnonymousUserExists[0]) {
+			authorizedPost.push(eq(posts.anonymousId, isAnonymousUserExists[0].id));
+		}
+
 		conditions.push(or(...authorizedPost));
 
 		const result = await db
@@ -487,14 +507,15 @@ export const reportPost = async (input: z.infer<typeof reportPostRequest>) => {
 	return result;
 };
 
-export const getReportedPost = async (
-	user: UserPayload
-) => {
-	if(user.role !== 'developer') {
-		return sendTRPCResponse({
-			status: 403,
-			message: 'You are not developer'
-		}, []);
+export const getReportedPost = async (user: UserPayload) => {
+	if (user.role !== 'developer') {
+		return sendTRPCResponse(
+			{
+				status: 403,
+				message: 'You are not developer'
+			},
+			[]
+		);
 	}
 
 	const conditions = [];
@@ -562,7 +583,7 @@ export const getReportedPost = async (
 			users.username,
 			users.image
 		)
-		.orderBy(sql`created_at DESC`)
+		.orderBy(sql`created_at DESC`);
 
 	return sendTRPCResponse(
 		{
