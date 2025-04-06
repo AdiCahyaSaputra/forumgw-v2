@@ -7,7 +7,7 @@
 		description?: string;
 		cancel: string;
 		submit: string;
-		onCancel: () => void;
+		onCancel?: () => void;
 		onSubmit: () => void;
 		isPending: boolean;
 	};

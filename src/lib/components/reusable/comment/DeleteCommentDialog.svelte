@@ -15,6 +15,8 @@
 		onSuccess: () => {
 			trpcClientUtils($page).comment.getPostComments.invalidate();
 			trpcClientUtils($page).post.getPostDetail.invalidate();
+
+      open = false;
 		},
 		onError: () => {
 			toast.error(m.global_error_message());
