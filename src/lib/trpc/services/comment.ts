@@ -11,7 +11,7 @@ import {
   users
 } from '$lib/server/db/schema';
 import { BadWordFilter, sendTRPCResponse } from '$lib/utils';
-import { and, desc, eq, lt, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, lt, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type {
   commentRequest,
@@ -127,7 +127,7 @@ export const getReplyComments = async (input: z.infer<typeof getReplyCommentsReq
     .from(replyComments)
     .innerJoin(users, eq(users.id, replyComments.userId))
     .where(and(...conditions))
-    .orderBy(desc(replyComments.createdAt))
+    .orderBy(asc(replyComments.createdAt))
     .limit(limit + 1);
 
   const hasNextPage = replies.length > limit;
