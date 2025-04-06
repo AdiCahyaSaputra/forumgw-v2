@@ -74,7 +74,7 @@
 	</div>
 	<LoadingState isLoading={$user.isPending}>
 		{#snippet loadingFallback()}
-			<p class="text-sm text-foreground w-[80%]">-</p>
+			<div class="w-24 mt-2 py-2 bg-secondary rounded-md"></div>
 		{/snippet}
 
 		<p class="text-foreground/60 w-[80%]">

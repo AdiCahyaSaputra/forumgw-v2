@@ -33,10 +33,18 @@
 	};
 
 	const { post, extraActions, customActions }: Props = $props();
+
+	const seeProfileHandler = () => {
+		if(post.user) {
+			goto(`/profile/${post.user.username}`);
+		}
+
+		return;
+	}
 </script>
 
 <div class="border-b">
-	<div class="flex items-start gap-2 p-4 pb-2">
+	<button type="button" class={["flex items-start gap-2 p-4 pb-2", post.user && "cursor-pointer"]} onclick={seeProfileHandler}>
 		<Avatar.Root class="rounded-md border m-0">
 			<Avatar.Image src={post.user?.image} alt="@shadcn" />
 			<Avatar.Fallback class="bg-white">
@@ -47,20 +55,18 @@
 				{/if}
 			</Avatar.Fallback>
 		</Avatar.Root>
-		<div class="flex items-start grow justify-between">
-			<div>
-				{#if post.user}
-					<h3 class="text-sm leading-none font-bold">{post.user.name}</h3>
-					<a href={`/profile/${post.user.username}`} class="text-sm hover:text-red-600">
-						@{post.user.username}
-					</a>
-				{:else if post.anonymous}
-					<h3 class="text-sm leading-none font-bold">{post.anonymous.name}</h3>
-					<p class="text-sm">{post.anonymous.username}</p>
-				{/if}
-			</div>
+		<div class="flex flex-col items-start">
+			{#if post.user}
+				<h3 class="text-sm leading-none font-bold">{post.user.name}</h3>
+				<a href={`/profile/${post.user.username}`} class="text-sm hover:text-red-600">
+					@{post.user.username}
+				</a>
+			{:else if post.anonymous}
+				<h3 class="text-sm leading-none font-bold">{post.anonymous.name}</h3>
+				<p class="text-sm">{post.anonymous.username}</p>
+			{/if}
 		</div>
-	</div>
+	</button>
 
 	<div class="px-4 pb-4">
 		<small class="text-foreground/60">{m.post_created_at()} {timeAgo(post.createdAt)}</small>
