@@ -18,6 +18,7 @@
 	import LoadingState from '../global/LoadingState.svelte';
 	import CardReplyComment from './CardReplyComment.svelte';
 	import CommentInput from './CommentInput.svelte';
+  import type { UserPayload } from '$lib/trpc/services/user';
 
 	type Props = {
 		openReplyComment: boolean;
@@ -26,6 +27,7 @@
 		defaultCommentText: string;
 		commentId: number;
 		repliesCount: number;
+    currentUser: UserPayload;
 	};
 
 	let {
@@ -34,7 +36,8 @@
 		formEditReplyComment,
 		defaultCommentText,
 		commentId,
-		repliesCount = $bindable()
+		repliesCount = $bindable(),
+    currentUser
 	}: Props = $props();
 
 	let loadingReplyComment = $state(false);
@@ -101,7 +104,7 @@
 			{#if $replies.data}
 				<div class="max-h-40 overflow-y-scroll">
 					{#each $replies.data.pages.flatMap((page) => page.data.replies) as replyComment, idx (idx)}
-						<CardReplyComment {replyComment} {formEditReplyComment} />
+						<CardReplyComment {replyComment} {formEditReplyComment} {currentUser} />
 					{/each}
 
 					{#if $replies.data.pages.at(-1)?.data.hasNextPage}

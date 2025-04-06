@@ -71,6 +71,7 @@
           formEditReplyComment={data.formEditReplyComment} 
 
           openReply={+(data.cid ?? '-1') === comment.id}
+          currentUser={data.user!}
         />
 			{/each}
 

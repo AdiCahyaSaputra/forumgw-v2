@@ -9,6 +9,7 @@
 	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import DeleteReplyCommentDialog from './DeleteReplyCommentDialog.svelte';
 	import EditReplyCommentDialog from './EditReplyCommentDialog.svelte';
+  import type { UserPayload } from '$lib/trpc/services/user';
 
 	type Props = {
 		replyComment: {
@@ -22,10 +23,11 @@
 			};
 			createdAt: Date;
 		};
+    currentUser: UserPayload;
 		formEditReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
 	};
 
-	const { replyComment, formEditReplyComment }: Props = $props();
+	const { replyComment, formEditReplyComment, currentUser }: Props = $props();
 
 	let openEditReplyComment = $state(false);
 	let openDeleteReplyComment = $state(false);
@@ -50,38 +52,41 @@
 			</div>
 		</div>
 
-		<EditReplyCommentDialog
-			bind:open={openEditReplyComment}
-			{formEditReplyComment}
-			text={replyComment.text}
-			commentId={replyComment.commentId}
-			replyCommentId={replyComment.id}
-		/>
+    {#if currentUser.username === replyComment.user.username}
+      <EditReplyCommentDialog
+        bind:open={openEditReplyComment}
+        {formEditReplyComment}
+        text={replyComment.text}
+        commentId={replyComment.commentId}
+        replyCommentId={replyComment.id}
+      />
 
-		<DeleteReplyCommentDialog bind:open={openDeleteReplyComment} replyCommentId={replyComment.id} />
+      <DeleteReplyCommentDialog bind:open={openDeleteReplyComment} replyCommentId={replyComment.id} />
 
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger>
-				{#snippet child({ props })}
-					<Button variant="outline" size="icon" {...props}>
-						<EllipsisVertical />
-					</Button>
-				{/snippet}
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content align="start" side="left">
-				<DropdownMenu.Group>
-					<DropdownMenu.Item class="cursor-pointer" onclick={() => (openEditReplyComment = true)}>
-						<PencilLine /> Edit
-					</DropdownMenu.Item>
-					<DropdownMenu.Item
-						class="data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive cursor-pointer"
-						onclick={() => (openDeleteReplyComment = true)}
-					>
-						<Trash2 /> Delete
-					</DropdownMenu.Item>
-				</DropdownMenu.Group>
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger>
+          {#snippet child({ props })}
+            <Button variant="outline" size="icon" {...props}>
+              <EllipsisVertical />
+            </Button>
+          {/snippet}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content align="start" side="left">
+          <DropdownMenu.Group>
+            <DropdownMenu.Item class="cursor-pointer" onclick={() => (openEditReplyComment = true)}>
+              <PencilLine /> Edit
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              class="data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive cursor-pointer"
+              onclick={() => (openDeleteReplyComment = true)}
+            >
+              <Trash2 /> Delete
+            </DropdownMenu.Item>
+          </DropdownMenu.Group>
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    {/if}
+
 	</div>
 
 	<div class="px-4 pb-4">

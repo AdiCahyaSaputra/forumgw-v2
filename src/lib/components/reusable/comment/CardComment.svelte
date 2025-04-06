@@ -4,9 +4,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import {
 		replyCommentRequest,
-		deleteReplyCommentRequest,
 		commentRequest,
-		deleteCommentRequest
 	} from '$lib/trpc/schema/commentSchema';
 	import { timeAgo } from '$lib/utils';
 	import { ChevronDown, ChevronRight, EllipsisVertical, PencilLine, Trash2 } from '@lucide/svelte';
@@ -15,6 +13,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import EditCommentDialog from './EditCommentDialog.svelte';
 	import DeleteCommentDialog from './DeleteCommentDialog.svelte';
+  import type { UserPayload } from '$lib/trpc/services/user';
 
 	type Props = {
 		comment: {
@@ -37,6 +36,7 @@
 		formEditReplyComment: SuperValidated<Infer<ReturnType<typeof replyCommentRequest>>>;
 
     openReply: boolean;
+    currentUser: UserPayload;
 	};
 
 	const {
@@ -46,7 +46,8 @@
 		formReplyComment,
 		formEditReplyComment,
 
-    openReply
+    openReply,
+    currentUser
 	}: Props = $props();
 
 	let openReplyComment = $state(openReply);
@@ -87,38 +88,40 @@
 			</div>
 		</div>
 
-		<EditCommentDialog
-			bind:openEditComment
-			{formEditComment}
-			postId={comment.postId}
-			commentId={comment.id}
-			text={comment.text}
-		/>
+    {#if currentUser.username === comment.user.username}
+      <EditCommentDialog
+        bind:openEditComment
+        {formEditComment}
+        postId={comment.postId}
+        commentId={comment.id}
+        text={comment.text}
+      />
 
-		<DeleteCommentDialog commentId={comment.id} bind:open={openDeleteComment} />
+      <DeleteCommentDialog commentId={comment.id} bind:open={openDeleteComment} />
 
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger>
-				{#snippet child({ props })}
-					<Button variant="outline" size="icon" {...props}>
-						<EllipsisVertical />
-					</Button>
-				{/snippet}
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content align="start" side="left">
-				<DropdownMenu.Group>
-					<DropdownMenu.Item class="cursor-pointer" onclick={() => (openEditComment = true)}>
-						<PencilLine /> Edit
-					</DropdownMenu.Item>
-					<DropdownMenu.Item
-						class="data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive cursor-pointer"
-            onclick={() => openDeleteComment = true}
-					>
-						<Trash2 /> Delete
-					</DropdownMenu.Item>
-				</DropdownMenu.Group>
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger>
+          {#snippet child({ props })}
+            <Button variant="outline" size="icon" {...props}>
+              <EllipsisVertical />
+            </Button>
+          {/snippet}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content align="start" side="left">
+          <DropdownMenu.Group>
+            <DropdownMenu.Item class="cursor-pointer" onclick={() => (openEditComment = true)}>
+              <PencilLine /> Edit
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              class="data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive cursor-pointer"
+              onclick={() => openDeleteComment = true}
+            >
+              <Trash2 /> Delete
+            </DropdownMenu.Item>
+          </DropdownMenu.Group>
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    {/if}
 	</div>
 
 	<div class="px-4 pb-4">
@@ -152,5 +155,6 @@
 		defaultCommentText=""
 		commentId={comment.id}
 		repliesCount={comment._count.replies}
+    {currentUser}
 	/>
 </div>
