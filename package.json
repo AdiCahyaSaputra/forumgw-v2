@@ -54,6 +54,7 @@
 	},
 	"dependencies": {
 		"@inlang/paraglide-sveltekit": "^0.15.5",
+		"@prgm/sveltekit-progress-bar": "^3.0.2",
 		"@tanstack/svelte-query": "^5.67.3",
 		"@trpc/client": "^10.45.2",
 		"@trpc/server": "^10.45.2",
