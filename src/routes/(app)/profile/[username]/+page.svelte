@@ -77,7 +77,7 @@
 			<div class="w-24 mt-2 py-2 bg-secondary rounded-md"></div>
 		{/snippet}
 
-		<p class="text-foreground/60 w-[80%]">
+		<p class="text-foreground/60 w-[80%] cst-wrap-text">
 			{$user.data?.data?.bio ?? 'No Bio'}
 		</p>
 	</LoadingState>

@@ -31,7 +31,7 @@
 			case NotificationType.comment:
 				return '💬 ' + m.notif_message_type_comment();
 			case NotificationType.reply:
-				return '🗨️ ' + m.notif_message_type_reply();
+				return '📥 ' + m.notif_message_type_reply();
 			case NotificationType.report:
 				return '😈 ' + m.notif_message_type_report();
 			case NotificationType.mention:
@@ -54,21 +54,21 @@
     goto(`/discussion/${query}`);
   }}
 >
-	<Card.Header class="flex lg:gap-4 flex-row lg:p-4 p-2 gap-2">
+	<Card.Header class="flex lg:gap-4 flex-row p-4 gap-2">
 		<Avatar.Root class="rounded-md border m-0">
 			<Avatar.Image src={notification.user.image} alt="@shadcn" />
 			<Avatar.Fallback class="bg-white">
 				{notification.user.username[0].toUpperCase()}
 			</Avatar.Fallback>
 		</Avatar.Root>
-		<div class="flex grow justify-between items-center">
+		<div class="flex grow justify-between items-center gap-4">
 			<div class="space-y-1">
 				<Card.Title class="line-clamp-1">{notification.user.name} (@{notification.user.username})</Card.Title>
-				<Card.Description class={['line-clamp-1', !notification.isRead && 'text-white']}>
+				<Card.Description class={['cst-wrap-text', !notification.isRead && 'text-white/80']}>
           {getNotifMessage(notification.type)} {timeAgo(notification.createdAt)}
         </Card.Description>
 			</div>
-      <ArrowRight class="hidden lg:block" />
+      <ArrowRight />
 		</div>
 	</Card.Header>
 </Card.Root>

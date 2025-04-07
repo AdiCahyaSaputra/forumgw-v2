@@ -65,7 +65,7 @@
   });
 </script>
 
-<div id="{comment.id.toString()}" class={['rounded-md border', openReplyComment && 'border-primary']}>
+<div id="{comment.id.toString()}" class={['rounded-md border overflow-hidden', openReplyComment && 'border-primary']}>
 	<div class="flex justify-between items-start p-4 pb-2">
 		<div class="flex items-start gap-2">
 			<Avatar.Root class="rounded-md border m-0">
@@ -135,7 +135,7 @@
 	<div>
 		<Button
 			onclick={() => (openReplyComment = !openReplyComment)}
-			class="px-4 rounded-none w-full justify-between items-center border-x-0"
+			class="px-4 rounded-none w-full justify-between items-center border-x-0 shadow-none"
 			variant="outline"
 		>
 			<span class="text-sm text-foreground/60">

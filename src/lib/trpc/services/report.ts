@@ -36,7 +36,7 @@ export const safePost = async (input: z.infer<typeof safePostRequest>) => {
 	const response = await db
 		.delete(reports)
 		.where(eq(reports.postId, postId))
-		.then(() => sendTRPCResponse({ status: 200, message: 'Deleted!' }))
+		.then(() => sendTRPCResponse({ status: 200, message: 'Okay!' }))
 		.catch(() => sendTRPCResponse({ status: 500, message: m.global_error_message() }));
 
 	return response;
