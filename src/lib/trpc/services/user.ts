@@ -13,10 +13,10 @@ import { SignJWT, jwtVerify } from 'jose';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import type {
-  editUserRequest,
-  getUserForInviteRequest,
-  getUserForMentioningRequest,
-  getUserProfileRequest
+	editUserRequest,
+	getUserForInviteRequest,
+	getUserForMentioningRequest,
+	getUserProfileRequest
 } from '../schema/userSchema';
 import type { CtxType } from '$lib/constant';
 
@@ -228,6 +228,21 @@ export const authenticateUser = async (formData: z.infer<LoginSchema>, ctx: CtxT
 
 export const registeringNewUser = async (formData: z.infer<RegisterSchema>) => {
 	const { name, username, password } = formData;
+
+	const isAlreadyRegistered = await db
+		.select({
+			username: users.username
+		})
+		.from(users)
+		.where(eq(users.username, username))
+		.limit(1);
+
+  if (isAlreadyRegistered.length > 0) {
+    return sendTRPCResponse({
+      status: 400,
+      message: m.register_already_exists()
+    });
+  }
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 

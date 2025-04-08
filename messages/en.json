@@ -12,6 +12,7 @@
   "login_message_mismatch_credentials": "I think Username / Password is not match",
   "login_message_user_not_exists": "Oops, this user is not on our databases",
   "login_message_session_error": "Sh*t, there's a problem while setting user session",
+  "register_already_exists": "User already exists!",
   "register_title": "Join with us!",
   "register_detail": "Fill in your full name, email, and the most secure password. The whole world is curious to know who you are!",
   "register_button": "Register Now",

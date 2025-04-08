@@ -12,6 +12,7 @@
   "login_message_user_not_exists": "Waduh user nya belom di daftarin ini mah",
   "login_message_session_error": "Duh ada masalah pas nge set session nya ni",
   "login_question_to_regis": "Bikin akun dulu deh",
+  "register_already_exists": "User nya udah terdaftar!",
   "register_title": "Gabung sama kita!",
   "register_detail": "Isi nama lengkap, email, dan password yang paling aman yaw. Satu dunia pengen tau lo siapa",
   "register_button": "Gass Daftar",
