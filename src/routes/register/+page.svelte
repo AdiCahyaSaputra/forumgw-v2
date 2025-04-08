@@ -19,7 +19,6 @@
 	import { ChevronRight, Loader, Users } from '@lucide/svelte';
 	import { languageTag } from '$lib/paraglide/runtime';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import type { ActionResult } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -46,9 +45,13 @@
 
 			disabledForRedirect = true;
 
+      toast.success('Registered!');
+
 			await goto('/login', { replaceState: true });
 		},
 		onError: (error) => {
+      console.log(error);
+
 			toast.error(m.global_error_message());
 		}
 	});
@@ -59,6 +62,8 @@
 			const data = Object.fromEntries(formData) as z.infer<RegisterSchema>;
 
 			$registerMutate.mutate(data);
+
+      return false;
 		}
 	});
 
