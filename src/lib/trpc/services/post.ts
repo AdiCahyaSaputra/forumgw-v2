@@ -58,9 +58,31 @@ export const getPublicPostDiscussions = async (
 		conditions.push(eq(posts.userId, userId));
 	}
 
-	if (cursor) {
-		conditions.push(lt(posts.id, cursor));
-	}
+	// Improved cursor-based pagination
+if (cursor) {
+  // Get the cursor reference post's creation date
+  const cursorPost = await db
+    .select({ createdAt: posts.createdAt })
+    .from(posts)
+    .where(eq(posts.id, cursor))
+    .limit(1);
+
+  if (cursorPost.length > 0) {
+    // Use compound condition for more efficient pagination
+    conditions.push(
+      or(
+        lt(posts.createdAt, cursorPost[0].createdAt),
+        and(
+          eq(posts.createdAt, cursorPost[0].createdAt),
+          lt(posts.id, cursor)
+        )
+      )
+    );
+  } else {
+    // Fallback if cursor post not found
+    conditions.push(lt(posts.id, cursor));
+  }
+}
 
 	const results = await db
 		.select({
