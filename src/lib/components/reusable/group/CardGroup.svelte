@@ -49,7 +49,7 @@
 
 		<div>
 			<h3 class="text-sm leading-none font-bold">{leader.name}</h3>
-			<a href={`/profil/${leader.username}`} class="text-sm hover:underline">
+			<a href={`/profile/${leader.username}`} class="text-sm hover:underline">
 				{leader.username}
 			</a>
 		</div>

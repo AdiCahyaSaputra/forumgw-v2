@@ -45,7 +45,7 @@
 			<div class="flex items-start grow justify-between">
 				<div>
 					<h3 class="text-sm leading-none font-bold">{replyComment.user.name}</h3>
-					<a href={`/profil/${replyComment.user.username}`} class="text-sm hover:underline">
+					<a href={`/profile/${replyComment.user.username}`} class="text-sm hover:underline">
 						{replyComment.user.username}
 					</a>
 				</div>

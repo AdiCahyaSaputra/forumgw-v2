@@ -81,7 +81,7 @@
 			<div class="flex items-start grow justify-between">
 				<div>
 					<h3 class="text-sm leading-none font-bold">{comment.user.name}</h3>
-					<a href={`/profil/${comment.user.username}`} class="text-sm hover:underline">
+					<a href={`/profile/${comment.user.username}`} class="text-sm hover:underline">
 						{comment.user.username}
 					</a>
 				</div>
