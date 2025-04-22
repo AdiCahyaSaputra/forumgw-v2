@@ -24,6 +24,31 @@
 
 	let { formComment, postId, user }: Props = $props();
 
+	let formResult: ActionResult | null = $state(null);
+	let mentionedUserIds: string[] = $state([]);
+
+	let form = superForm(formComment, {
+		validators: zodClient(commentRequest()),
+		onSubmit: ({ formData }) => {
+			formData.append('mentionUsers', mentionedUserIds.join(','));
+
+			$commentMutate.mutate({
+				postId,
+				text: formData.get('text') as string,
+				mentionUsers: formData.get('mentionUsers') as string
+			});
+		},
+		onUpdate: async ({ result }) => {
+			if (result.type !== 'success') {
+				toast.error(result.data?.message || m.global_error_message());
+			}
+		}
+	});
+
+	const { form: formData, enhance, reset } = form;
+
+	$inspect($formData.text);
+
 	let commentMutate = trpc($page).comment.createComment.createMutation({
 		onMutate: async (newComment) => {
 			await trpcClientUtils($page).comment.getPostComments.cancel();
@@ -75,43 +100,30 @@
 			}
 
 			toast.error(m.global_error_message());
+
+			formResult = {
+				type: 'error',
+				error: 'Cannot submit comment'
+			}
+		},
+		onSuccess: () => {
+			formResult = {
+				type: 'success',
+				status: 201
+			}
 		},
 		onSettled: () => {
 			trpcClientUtils($page).comment.getPostComments.invalidate();	
+
+			console.log("Comment submitted");
+
+			$formData.text = '';
+			$formData.mentionUsers = '';
+
+			$commentMutate.reset();
+			reset();
 		}
 	})
-
-	let formResult: ActionResult | null = $state(null);
-	let mentionedUserIds: string[] = $state([]);
-
-	let form = superForm(formComment, {
-		validators: zodClient(commentRequest()),
-		onSubmit: ({ formData }) => {
-			formData.append('mentionUsers', mentionedUserIds.join(','));
-
-			$commentMutate.mutate({
-				postId,
-				text: formData.get('text') as string,
-				mentionUsers: formData.get('mentionUsers') as string
-			});
-		},
-		onResult: async ({ result }) => {
-			formResult = result;
-
-      // TODO: Trigger notification change using tRPC SSE (Server Send Event)
-		},
-		onUpdate: async ({ result }) => {
-			if (result.type !== 'success') {
-				toast.error(result.data?.message || m.global_error_message());
-			}
-
-			setTimeout(() => {
-				formResult = null;
-			}, 10);
-		}
-	});
-
-	const { form: formData, enhance } = form;
 </script>
 
 <div class="border-b p-4">
