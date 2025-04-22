@@ -54,7 +54,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (!user) {
 			// Make sure the cookies are deleted
 			event.cookies.delete('TOKEN', { path: '/' });
-			event.cookies.delete('REFRESH_TOKEN', { path: '/' });
 
 			throw redirect(303, '/login');
 		}

@@ -1,11 +1,10 @@
-import * as m from '$lib/paraglide/messages.js';
-import { db } from '$lib/server/db';
-import { jwts } from '$lib/server/db/schema';
 import { createPostRequest } from '$lib/trpc/schema/postSchema';
-import { fail, type Actions } from '@sveltejs/kit';
+import { type Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
+import { invalidateAllAuthSession } from '$lib/trpc/services/auth';
+import { verifyUserToken } from '$lib/trpc/services/user';
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -15,21 +14,16 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
 	logout: async (event) => {
-		db.update(jwts)
-			.set({
-				expiredIn: new Date(Date.now())
-			})
-			.catch(() =>
-				fail(400, {
-					message: m.global_error_message()
-				})
-			);
+		const { user } = await verifyUserToken(event);
 
-		event.cookies.delete('TOKEN', { path: '/' });
-		event.cookies.delete('REFRESH_TOKEN', { path: '/' });
+		if (user) {
+			event.cookies.delete('TOKEN', { path: '/' });
+
+			await invalidateAllAuthSession(user.id);
+		}
 
 		return {
 			message: 'ok'
 		};
-	},
+	}
 };

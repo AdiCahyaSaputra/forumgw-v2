@@ -1,16 +1,12 @@
-import { env } from '$env/dynamic/private';
-import { JWT_SECRET } from '$env/static/private';
 import * as m from '$lib/paraglide/messages.js';
 import { db } from '$lib/server/db';
-import { groupMembers, jwts, roles, users } from '$lib/server/db/schema';
+import { groupMembers, roles, users } from '$lib/server/db/schema';
 import type { LoginSchema } from '$lib/trpc/schema/loginSchema.js';
 import type { RegisterSchema } from '$lib/trpc/schema/registerSchema.js';
 import { sendTRPCResponse } from '$lib/utils.js';
 import type { RequestEvent } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
-import { and, eq, gt, ilike, not, sql } from 'drizzle-orm';
-import { SignJWT, jwtVerify } from 'jose';
-import { nanoid } from 'nanoid';
+import { and, eq, ilike, not } from 'drizzle-orm';
 import { z } from 'zod';
 import type {
 	editUserRequest,
@@ -19,6 +15,7 @@ import type {
 	getUserProfileRequest
 } from '../schema/userSchema';
 import type { CtxType } from '$lib/constant';
+import { createAuthSession, validateAuthSession } from './auth';
 
 type User = typeof users.$inferSelect;
 type Role = typeof roles.$inferSelect;
@@ -31,148 +28,13 @@ export type UserPayload = {
 	bio: User['bio'];
 	role: Role['name'];
 };
-type JWTPayload = Omit<typeof jwts.$inferSelect, 'userId'>;
-
-export const createJWT = async (userId: User['id']) => {
-	try {
-		const [createdJwt] = await db
-			.insert(jwts)
-			.values({
-				userId,
-				expiredIn: new Date(Date.now() + 2 * (60 * 60 * 1000))
-			})
-			.returning({ id: jwts.id, expiredIn: jwts.expiredIn });
-
-		const token = await new SignJWT({
-			id: createdJwt.id,
-			expiredIn: createdJwt.expiredIn
-		})
-			.setProtectedHeader({ alg: 'HS256' })
-			.setJti(nanoid())
-			.setIssuedAt()
-			.setExpirationTime('2h')
-			.sign(new TextEncoder().encode(env.JWT_SECRET));
-
-		const refreshToken = await new SignJWT({
-			id: createdJwt.id,
-			expiredIn: new Date(Date.now() + 24 * (60 * 60 * 1000)) // 1 day
-		})
-			.setProtectedHeader({ alg: 'HS256' })
-			.setJti(nanoid())
-			.setIssuedAt()
-			.setExpirationTime('1d')
-			.sign(new TextEncoder().encode(env.JWT_SECRET));
-
-		return {
-			token,
-			refreshToken
-		};
-	} catch (err) {
-		console.error(err);
-
-		return {
-			token: null,
-			refreshToken: null
-		};
-	}
-};
-
-export const refreshJWT = async (refreshToken: string) => {
-	const decodedPayload = await jwtVerify(refreshToken, new TextEncoder().encode(JWT_SECRET))
-		.then((decoded) => decoded.payload as JWTPayload)
-		.catch(() => null);
-
-	if (decodedPayload) {
-		const usersFromToken = await db
-			.select({
-				id: users.id,
-				name: users.name,
-				username: users.username,
-				image: users.image,
-				bio: users.bio,
-				role: roles.name
-			})
-			.from(jwts)
-			.innerJoin(users, eq(jwts.userId, users.id))
-			.innerJoin(roles, eq(users.roleId, roles.id))
-			.where(and(eq(jwts.id, decodedPayload.id), gt(jwts.expiredIn, sql`NOW()`)))
-			.limit(1);
-
-		if (usersFromToken.length > 0) {
-			return {
-				user: usersFromToken[0] as UserPayload
-			};
-		}
-	}
-
-	return { user: null }; // When decodedPayload are null and usersFromToken.length is < 1
-};
 
 export const verifyUserToken = async (
 	event: RequestEvent
 ): Promise<{ user: UserPayload | null }> => {
-	let token = event.cookies.get('TOKEN');
-	let refreshToken = event.cookies.get('REFRESH_TOKEN');
+	const user = await validateAuthSession(event.cookies.get('TOKEN'));
 
-	if (!token) {
-		if (refreshToken) {
-			const payload = await refreshJWT(refreshToken);
-
-			if (payload.user) {
-				const { token: newToken, refreshToken: newRefreshToken } = await createJWT(payload.user.id);
-
-				if (newToken && newRefreshToken) {
-					event.cookies.set('TOKEN', newToken, {
-						httpOnly: true,
-						secure: true,
-						expires: new Date(Date.now() + 2 * (60 * 60 * 1000)),
-						path: '/'
-					});
-
-					event.cookies.set('REFRESH_TOKEN', newRefreshToken, {
-						httpOnly: true,
-						secure: true,
-						expires: new Date(Date.now() + 24 * (60 * 60 * 1000)),
-						path: '/'
-					});
-
-					token = newToken;
-					refreshToken = newRefreshToken;
-				}
-			}
-		}
-
-		return { user: null }; // When refreshToken, payload.user, newToken, newRefreshToken are undefined or null
-	}
-
-	const decodedPayload = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET))
-		.then((decoded) => decoded.payload as JWTPayload)
-		.catch(() => null);
-
-	if (decodedPayload) {
-		const usersFromToken = await db
-			.select({
-				id: users.id,
-				name: users.name,
-				username: users.username,
-				image: users.image,
-				bio: users.bio,
-				role: roles.name
-			})
-			.from(jwts)
-			.innerJoin(users, eq(jwts.userId, users.id))
-			.leftJoin(roles, eq(users.roleId, roles.id))
-			.where(and(eq(jwts.id, decodedPayload.id), gt(jwts.expiredIn, sql`NOW()`)))
-			.limit(1);
-
-		if (usersFromToken.length > 0) {
-			return {
-				user: usersFromToken[0] as UserPayload
-			};
-		}
-	}
-
-	return { user: null }; // When decodedPayload are null and usersFromToken.length is < 1
+	return { user }; 
 };
 
 export const authenticateUser = async (formData: z.infer<LoginSchema>, ctx: CtxType) => {
@@ -195,22 +57,9 @@ export const authenticateUser = async (formData: z.infer<LoginSchema>, ctx: CtxT
 		});
 	}
 
-	const { token, refreshToken } = await createJWT(user.id);
-
-	if (!token && !refreshToken) {
-		return sendTRPCResponse({
-			status: 401,
-			message: m.login_message_session_error()
-		});
-	}
+	const token = await createAuthSession(user.id);
 
 	ctx.event.cookies.set('TOKEN', token, {
-		expires: new Date(Date.now() + 2 * (60 * 60 * 1000)),
-		path: '/'
-	});
-
-	ctx.event.cookies.set('REFRESH_TOKEN', refreshToken, {
-		expires: new Date(Date.now() + 24 * (60 * 60 * 1000)),
 		path: '/'
 	});
 
@@ -221,7 +70,6 @@ export const authenticateUser = async (formData: z.infer<LoginSchema>, ctx: CtxT
 		},
 		{
 			token,
-			refreshToken
 		}
 	);
 };
