@@ -26,7 +26,7 @@
 	});
 
 	$effect(() => {
-		if(isIntersecting) {
+		if (isIntersecting) {
 			$comments.fetchNextPage();
 		}
 	});
@@ -48,7 +48,11 @@
 
 	{#if $post.data}
 		<CardPost post={$post.data.data.post} />
-		<CreateCommentForm formComment={data.formComment} postId={$post.data.data.post.id} />
+		<CreateCommentForm
+			formComment={data.formComment}
+			postId={$post.data.data.post.id}
+			user={data.user!}
+		/>
 	{/if}
 </LoadingState>
 
@@ -62,17 +66,14 @@
 	{#if $comments.data}
 		<div class="p-4 flex flex-col space-y-4">
 			{#each $comments.data.pages.flatMap((page) => page.data.comments) as comment (comment.id)}
-        <CardComment 
-          {comment} 
-
-          formEditComment={data.formEditComment} 
-
-          formReplyComment={data.formReplyComment} 
-          formEditReplyComment={data.formEditReplyComment} 
-
-          openReply={+(data.cid ?? '-1') === comment.id}
-          currentUser={data.user!}
-        />
+				<CardComment
+					{comment}
+					formEditComment={data.formEditComment}
+					formReplyComment={data.formReplyComment}
+					formEditReplyComment={data.formEditReplyComment}
+					openReply={+(data.cid ?? '-1') === comment.id}
+					currentUser={data.user!}
+				/>
 			{/each}
 
 			{#if $comments.data.pages.at(-1)?.data.hasNextPage}

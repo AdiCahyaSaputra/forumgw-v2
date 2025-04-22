@@ -1,12 +1,13 @@
 import { logger } from '$lib/trpc/middleware/logger';
 import { authenticated } from '../middleware/authenticated';
 import {
+  commentRequest,
   deleteCommentRequest,
   deleteReplyCommentRequest,
   getPostCommentsRequest,
   getReplyCommentsRequest
 } from '../schema/commentSchema';
-import { deleteComment, deleteReplyComment, getPostComments, getReplyComments } from '../services/comment';
+import { createComment, deleteComment, deleteReplyComment, getPostComments, getReplyComments } from '../services/comment';
 import { t } from '../t';
 
 export const comment = t.router({
@@ -18,6 +19,11 @@ export const comment = t.router({
     .use(logger)
     .input(getReplyCommentsRequest)
     .query(({ input }) => getReplyComments(input)),
+  createComment: t.procedure
+   .use(logger)
+   .use(authenticated)
+   .input(commentRequest())
+   .mutation(({ input, ctx }) => createComment(input, ctx.user)),
   deleteComment: t.procedure
     .use(logger)
     .use(authenticated)

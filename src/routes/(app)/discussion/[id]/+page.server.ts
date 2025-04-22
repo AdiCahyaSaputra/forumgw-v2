@@ -1,6 +1,5 @@
 import { commentRequest, replyCommentRequest } from '$lib/trpc/schema/commentSchema';
 import {
-  createComment,
   editComment,
   editReplyComment,
   replyComment
@@ -24,42 +23,8 @@ export const load: PageServerLoad = async (event) => {
   };
 };
 
+// TODO: refactor this to use tanstack mutate
 export const actions: Actions = {
-  createComment: async (event) => {
-    const form = await superValidate(event, zod(commentRequest()));
-
-    if (!form.valid) {
-      console.log(form.errors);
-
-      return fail(400, {
-        form
-      });
-    }
-
-    const { user } = await verifyUserToken(event);
-
-    if (!user) {
-      return fail(401, {
-        form,
-        message: 'Unauthorized'
-      });
-    }
-
-    const response = await createComment(form.data, user);
-
-    if (response.status !== 201) {
-      const { status, message } = response;
-
-      return fail(status, {
-        form,
-        message
-      });
-    }
-
-    return {
-      form
-    };
-  },
   editComment: async (event) => {
     const form = await superValidate(event, zod(commentRequest()));
 

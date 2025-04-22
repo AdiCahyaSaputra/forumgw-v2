@@ -12,31 +12,91 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import CommentInput from './CommentInput.svelte';
+	import { trpc } from '$lib/trpc/client';
+	import type { UserPayload } from '$lib/trpc/services/user';
+	import type { InfiniteData } from '@tanstack/svelte-query';
 
 	type Props = {
 		formComment: SuperValidated<Infer<ReturnType<typeof commentRequest>>>;
 		postId: string;
+		user: UserPayload;
 	};
 
-	let { formComment, postId }: Props = $props();
+	let { formComment, postId, user }: Props = $props();
 
-	let loadingComment = $state(false);
+	let commentMutate = trpc($page).comment.createComment.createMutation({
+		onMutate: async (newComment) => {
+			await trpcClientUtils($page).comment.getPostComments.cancel();
+
+			const previousComments = trpcClientUtils($page).comment.getPostComments.getInfiniteData({ postId });
+
+			trpcClientUtils($page).comment.getPostComments.setInfiniteData({ postId }, (old) => {
+				if(!old) return { pages: [], pageParams: [] };
+
+				const newPages = [...old.pages];
+
+				if (newPages.length > 0) {
+					newPages[0] = {
+						...newPages[0],
+						data: {
+							...newPages[0].data,
+							comments: [
+								{
+									id: previousComments?.pages[0].data.comments[0].id! + 1,
+									text: newComment.text,
+									postId: postId,
+									_count: {
+										replies: 0	
+									},
+									user: {
+										username: user.username,
+										name: user.name,
+										image: user.image
+									},
+									createdAt: new Date()
+								},
+								...newPages[0].data.comments
+							]
+						}
+					};
+				}
+
+				return {
+					...old,
+					newPages
+				}
+			});
+
+			return { previousComments };
+		},
+		onError: (error, variables, context: { previousComments: InfiniteData<any> | undefined }) => {
+			if(context?.previousComments) {
+				trpcClientUtils($page).comment.getPostComments.setInfiniteData({ postId }, () => context.previousComments!);	
+			}
+
+			toast.error(m.global_error_message());
+		},
+		onSettled: () => {
+			trpcClientUtils($page).comment.getPostComments.invalidate();	
+		}
+	})
+
 	let formResult: ActionResult | null = $state(null);
 	let mentionedUserIds: string[] = $state([]);
 
 	let form = superForm(formComment, {
 		validators: zodClient(commentRequest()),
 		onSubmit: ({ formData }) => {
-			loadingComment = true;
-
 			formData.append('mentionUsers', mentionedUserIds.join(','));
+
+			$commentMutate.mutate({
+				postId,
+				text: formData.get('text') as string,
+				mentionUsers: formData.get('mentionUsers') as string
+			});
 		},
 		onResult: async ({ result }) => {
 			formResult = result;
-			loadingComment = false;
-
-			trpcClientUtils($page).comment.getPostComments.invalidate();
-			trpcClientUtils($page).post.getPostDetail.invalidate();
 
       // TODO: Trigger notification change using tRPC SSE (Server Send Event)
 		},
@@ -71,7 +131,7 @@
 			<Form.FieldErrors />
 		</Form.Field>
 		<Input name="postId" value={postId} class="hidden" />
-		<Button size="icon" type="submit" disabled={loadingComment}>
+		<Button size="icon" type="submit" disabled={$commentMutate.isPending}>
 			<SendHorizonal />
 		</Button>
 	</form>
