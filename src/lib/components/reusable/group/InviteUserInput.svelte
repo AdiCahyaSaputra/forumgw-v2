@@ -47,7 +47,7 @@
 	}
 
 	$effect(() => {
-		console.log(usernameSearch, ' Dari effect');
+		
 
 		const timeout = setTimeout(() => {
 			const isExists = $allUsers.data?.data.users.find(

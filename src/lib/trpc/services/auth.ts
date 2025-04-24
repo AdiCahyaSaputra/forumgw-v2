@@ -38,7 +38,7 @@ export const validateAuthSession = async (token?: string): Promise<UserPayload |
 		.catch(() => null);
 
 	if (decodedPayload) {
-		console.log(decodedPayload);
+		
 
 		// More than 10 days didn't scroll forumgw
 		if (Date.now() >= (new Date(decodedPayload.expiredIn)).getTime()) {

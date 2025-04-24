@@ -46,7 +46,7 @@
 	}
 
 	$effect(() => {
-		console.log(tagSearch, ' Dari effect');
+		
 
 		const timeout = setTimeout(() => {
 			const isExists = $allTags.data?.data.tags.find(

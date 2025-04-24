@@ -53,50 +53,53 @@
 		onMutate: async (newComment) => {
 			await trpcClientUtils($page).comment.getPostComments.cancel();
 
-			const previousComments = trpcClientUtils($page).comment.getPostComments.getInfiniteData({ postId });
+			const previousComments = trpcClientUtils($page).comment.getPostComments.getInfiniteData({
+				postId
+			});
 
 			trpcClientUtils($page).comment.getPostComments.setInfiniteData({ postId }, (old) => {
-				if(!old) return { pages: [], pageParams: [] };
+				if (!old) return { pages: [], pageParams: [] };
 
 				const newPages = [...old.pages];
 
 				if (newPages.length > 0) {
-					newPages[0] = {
-						...newPages[0],
-						data: {
-							...newPages[0].data,
-							comments: [
-								{
-									id: previousComments?.pages[0].data.comments[0].id! + 1,
-									text: newComment.text,
-									postId: postId,
-									_count: {
-										replies: 0	
-									},
-									user: {
-										username: user.username,
-										name: user.name,
-										image: user.image
-									},
-									createdAt: new Date()
-								},
-								...newPages[0].data.comments
-							]
-						}
-					};
+
+					const randomNumber = Math.floor(Math.random() * 10) + Date.now();
+
+					newPages[0].data.comments = [
+						{
+							id: randomNumber,
+							text: newComment.text,
+							postId: postId,
+							_count: {
+								replies: 0
+							},
+							user: {
+								username: user.username,
+								name: user.name,
+								image: user.image
+							},
+							createdAt: new Date()
+						},
+						...newPages[0].data.comments
+					];
+
 				}
 
 				return {
 					...old,
 					newPages
-				}
+				};
 			});
 
 			return { previousComments };
 		},
 		onError: (error, variables, context: { previousComments: InfiniteData<any> | undefined }) => {
-			if(context?.previousComments) {
-				trpcClientUtils($page).comment.getPostComments.setInfiniteData({ postId }, () => context.previousComments!);	
+			if (context?.previousComments) {
+				trpcClientUtils($page).comment.getPostComments.setInfiniteData(
+					{ postId },
+					() => context.previousComments!
+				);
 			}
 
 			toast.error(m.global_error_message());
@@ -104,18 +107,18 @@
 			formResult = {
 				type: 'error',
 				error: 'Cannot submit comment'
-			}
+			};
 		},
 		onSuccess: () => {
 			formResult = {
 				type: 'success',
 				status: 201
-			}
+			};
 		},
 		onSettled: () => {
-			trpcClientUtils($page).comment.getPostComments.invalidate();	
+			trpcClientUtils($page).comment.getPostComments.invalidate();
 
-			console.log("Comment submitted");
+			('Comment submitted');
 
 			$formData.text = '';
 			$formData.mentionUsers = '';
@@ -123,7 +126,7 @@
 			$commentMutate.reset();
 			reset();
 		}
-	})
+	});
 </script>
 
 <div class="border-b p-4">

@@ -39,7 +39,7 @@
 
 	const { startUpload } = createUploadThing('imageUploader', {
 		onClientUploadComplete: (res) => {
-			console.log(res);
+			(res);
 
 			toast.success('Image uploaded successfully');
 

@@ -2,8 +2,6 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { verifyUserToken } from './services/user';
 import { setLanguageTag } from '$lib/paraglide/runtime';
-import { getBaseUrl } from '$lib/utils';
-import { TRPCError } from '@trpc/server';
 
 type SupportedLanguage = 'en' | 'id';
 
@@ -14,15 +12,6 @@ function isValidLanguage(lang: string): lang is SupportedLanguage {
 
 export async function createContext(event: RequestEvent) {
   try {
-    // CSRF Protection
-    if(event.request.method !== 'GET') {
-      const origin = event.request.headers.get('Origin');
-
-      if(origin === null || origin !== getBaseUrl()) {
-        throw new TRPCError({ code: 'FORBIDDEN' });
-      }
-    }
-
     const userContextPayload = await verifyUserToken(event);
     const requestedLang =
       event.request.headers.get('x-language') ||
@@ -37,7 +26,9 @@ export async function createContext(event: RequestEvent) {
       user: userContextPayload.user,
       event
     };
-  } catch {
+  } catch(e) {
+    console.log("Context Error: ", e);
+
     return { user: null, event };
   }
 }

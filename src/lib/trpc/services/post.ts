@@ -241,8 +241,6 @@ export const createNewPost = async (
 	const content = BadWordFilter(unfilteredPostContent);
 	const tagsName = unfilteredTagsName.map((tagName) => BadWordFilter(tagName));
 
-	console.log(unfilteredPostContent, content, tagsName);
-
 	if (groupId) {
 		const isGroupMember = await isGroupMemberCheck(groupId, user);
 
