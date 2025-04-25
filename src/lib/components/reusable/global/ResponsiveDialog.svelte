@@ -43,9 +43,9 @@
 					</Drawer.Description>
 				{/if}
 			</Drawer.Header>
-      <div class="px-4">
-        {@render children()}
-      </div>
+			<div class="px-4">
+				{@render children()}
+			</div>
 			<Drawer.Footer class="pt-2">
 				<Drawer.Close class={buttonVariants({ variant: 'outline' })}>{drawerClose}</Drawer.Close>
 			</Drawer.Footer>

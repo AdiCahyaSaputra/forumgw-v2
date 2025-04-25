@@ -14,13 +14,13 @@
 	{/snippet}
 
 	{#if $data.data}
-    {@render child()}
+		{@render child()}
 
 		{#if $data.data.pages.at(-1)?.data.hasNextPage}
 			<IntersectionObserver element={triggerElement} bind:intersecting={isIntersecting}>
-        <div bind:this={triggerElement}>
-          {@render intersectionChild()}
-        </div>
+				<div bind:this={triggerElement}>
+					{@render intersectionChild()}
+				</div>
 			</IntersectionObserver>
 		{/if}
 	{/if}

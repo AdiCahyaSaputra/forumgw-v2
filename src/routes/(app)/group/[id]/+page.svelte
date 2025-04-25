@@ -23,7 +23,7 @@
 	const postsInput = writable<PostsInput>({
 		tagIds: [],
 		groupId: data.params.id,
-		onlyCurrentUser: false,
+		onlyCurrentUser: false
 	});
 
 	let triggerMorePostsElement: HTMLElement | null = $state(null);
@@ -59,7 +59,7 @@
 		<h4 class="font-bold">Member List</h4>
 		<div class="flex flex-col mt-2 gap-2 items-start">
 			<div class="flex rtl:space-x-reverse">
-				{#each data.groupMetadata.members.slice(0,2) as member, idx (idx)}
+				{#each data.groupMetadata.members.slice(0, 2) as member, idx (idx)}
 					<Avatar.Root
 						class="border border-primary m-0 rounded-full"
 						style={{

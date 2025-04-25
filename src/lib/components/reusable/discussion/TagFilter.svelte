@@ -22,7 +22,7 @@
 					: allTags.filter((tag) => tag.name.toLowerCase().includes($tagFilter.name.toLowerCase()));
 		}
 
-    return data;
+		return data;
 	});
 </script>
 

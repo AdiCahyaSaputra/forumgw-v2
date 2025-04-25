@@ -65,7 +65,7 @@
 
 	{#if $comments.data}
 		<div class="p-4 flex flex-col space-y-4">
-			{#each $comments.data.pages.flatMap((page) => page.data.comments) as comment (comment.id)}
+			{#each $comments.data.pages.flatMap((page) => page.data.results) as comment (comment.id)}
 				<CardComment
 					{comment}
 					formEditComment={data.formEditComment}

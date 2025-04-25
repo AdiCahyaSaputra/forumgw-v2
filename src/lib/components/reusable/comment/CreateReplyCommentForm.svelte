@@ -18,7 +18,7 @@
 	import LoadingState from '../global/LoadingState.svelte';
 	import CardReplyComment from './CardReplyComment.svelte';
 	import CommentInput from './CommentInput.svelte';
-  import type { UserPayload } from '$lib/trpc/services/user';
+	import type { UserPayload } from '$lib/trpc/services/user';
 
 	type Props = {
 		openReplyComment: boolean;
@@ -27,7 +27,7 @@
 		defaultCommentText: string;
 		commentId: number;
 		repliesCount: number;
-    currentUser: UserPayload;
+		currentUser: UserPayload;
 	};
 
 	let {
@@ -37,7 +37,7 @@
 		defaultCommentText,
 		commentId,
 		repliesCount = $bindable(),
-    currentUser
+		currentUser
 	}: Props = $props();
 
 	let loadingReplyComment = $state(false);
@@ -67,9 +67,9 @@
 			$formData.text = '';
 
 			trpcClientUtils($page).comment.getPostComments.invalidate();
-      $replies.refetch();
+			$replies.refetch();
 
-      // TODO: Trigger notification change using tRPC SSE (Server Send Event)
+			// TODO: Trigger notification change using tRPC SSE (Server Send Event)
 		},
 		onUpdate: async ({ result }) => {
 			if (result.type !== 'success') {
@@ -103,7 +103,7 @@
 
 			{#if $replies.data}
 				<div class="max-h-40 overflow-y-scroll">
-					{#each $replies.data.pages.flatMap((page) => page.data.replies) as replyComment, idx (idx)}
+					{#each $replies.data.pages.flatMap((page) => page.data.results) as replyComment, idx (idx)}
 						<CardReplyComment {replyComment} {formEditReplyComment} {currentUser} />
 					{/each}
 

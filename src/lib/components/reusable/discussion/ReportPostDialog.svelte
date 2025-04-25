@@ -21,7 +21,7 @@
 				return;
 			}
 
-      open = false;
+			open = false;
 			toast.success(data.message);
 		},
 		onError: () => {
@@ -52,7 +52,9 @@
 			class="w-full"
 		/>
 
-		<Button type="submit" disabled={$reportPost.isPending} class="mt-4 w-full">{m.post_report_button_submit()}</Button>
+		<Button type="submit" disabled={$reportPost.isPending} class="mt-4 w-full"
+			>{m.post_report_button_submit()}</Button
+		>
 	</form>
 </ResponsiveDialog>
 

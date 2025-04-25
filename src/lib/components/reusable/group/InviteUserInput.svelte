@@ -47,8 +47,6 @@
 	}
 
 	$effect(() => {
-		
-
 		const timeout = setTimeout(() => {
 			const isExists = $allUsers.data?.data.users.find(
 				(user) => user.username.toLowerCase() === usernameSearch.toLowerCase()

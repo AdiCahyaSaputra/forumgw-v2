@@ -22,13 +22,13 @@
 		replyCommentId: number;
 	};
 
-	let { 
-    open = $bindable(false), 
-    formEditReplyComment, 
-    commentId, 
-    replyCommentId, 
-    text 
-  }: Props = $props();
+	let {
+		open = $bindable(false),
+		formEditReplyComment,
+		commentId,
+		replyCommentId,
+		text
+	}: Props = $props();
 
 	let editReplyLoading = $state(false);
 	let formResult: ActionResult | null = $state(null);
@@ -54,7 +54,7 @@
 				case 'success':
 					trpcClientUtils($page).comment.getReplyComments.invalidate();
 
-          // TODO: Trigger notification change using tRPC SSE (Server Send Event)
+					// TODO: Trigger notification change using tRPC SSE (Server Send Event)
 
 					open = false;
 					break;
@@ -62,7 +62,7 @@
 					toast.error(m.global_error_message());
 			}
 
-      formResult = null;
+			formResult = null;
 		},
 		onError: () => {
 			toast.error(m.global_error_message());
@@ -71,15 +71,15 @@
 
 	const { form: formData, enhance } = form;
 
-  onMount(() => {
-    $formData.text = text;
+	onMount(() => {
+		$formData.text = text;
 
-    // Don't do anything if there is mentioned users on the old text 
-  });
+		// Don't do anything if there is mentioned users on the old text
+	});
 </script>
 
 <ResponsiveDialog
-	bind:open={open}
+	bind:open
 	title={m.edit_comment_dialog_title()}
 	description={m.edit_comment_dialog_description()}
 	drawerClose={m.edit_comment_drawer_close()}
@@ -93,7 +93,7 @@
 						bind:mentionedUserIds
 						formResultType={formResult?.type}
 						defaultValue={text}
-            placeholder={m.comment_placeholder()}
+						placeholder={m.comment_placeholder()}
 						{...props}
 					/>
 				{/snippet}

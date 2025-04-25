@@ -35,16 +35,20 @@
 	const { post, extraActions, customActions }: Props = $props();
 
 	const seeProfileHandler = () => {
-		if(post.user) {
+		if (post.user) {
 			goto(`/profile/${post.user.username}`);
 		}
 
 		return;
-	}
+	};
 </script>
 
 <div class="border-b">
-	<button type="button" class={["flex items-start gap-2 p-4 pb-2", post.user && "cursor-pointer"]} onclick={seeProfileHandler}>
+	<button
+		type="button"
+		class={['flex items-start gap-2 p-4 pb-2', post.user && 'cursor-pointer']}
+		onclick={seeProfileHandler}
+	>
 		<Avatar.Root class="rounded-md border m-0">
 			<Avatar.Image src={post.user?.image} alt="@shadcn" />
 			<Avatar.Fallback class="bg-white">

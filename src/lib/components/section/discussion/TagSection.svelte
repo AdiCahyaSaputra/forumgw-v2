@@ -26,25 +26,22 @@
 		groupId,
 		className,
 		onlyCurrentUser,
-    userId
+		userId
 	}: Props = $props();
 
 	let tagsQueryFilter = writable<{
 		groupId?: string;
-    userId?: string;
-		onlyCurrentUser?: boolean,
+		userId?: string;
+		onlyCurrentUser?: boolean;
 	}>({
 		groupId: undefined,
-    userId,
-    onlyCurrentUser: onlyCurrentUser || false
+		userId,
+		onlyCurrentUser: onlyCurrentUser || false
 	});
 
-	const tags = trpc($page).tag.getAllTags.createInfiniteQuery(
-		tagsQueryFilter,
-		{
-			getNextPageParam: (lastPage) => lastPage.data.nextCursor
-		}
-	);
+	const tags = trpc($page).tag.getAllTags.createInfiniteQuery(tagsQueryFilter, {
+		getNextPageParam: (lastPage) => lastPage.data.nextCursor
+	});
 
 	let openFilter = $state(false);
 	let triggerMoreTagsElement: HTMLElement | null = $state(null);
@@ -60,8 +57,8 @@
 		// Listen to props changes
 		$tagsQueryFilter = {
 			groupId,
-      userId,
-			onlyCurrentUser: onlyCurrentUser || false,
+			userId,
+			onlyCurrentUser: onlyCurrentUser || false
 		};
 	});
 </script>

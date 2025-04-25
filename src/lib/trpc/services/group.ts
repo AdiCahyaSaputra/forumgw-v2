@@ -339,7 +339,10 @@ export const getGroupMembers = async (input: z.infer<typeof getGroupMembersReque
 	const { groupId, cursor } = input;
 
 	const limit = 10;
-	const conditions = [eq(groupMembers.groupId, groupId), not(eq(groupMembers.userId, groups.leaderId))];
+	const conditions = [
+		eq(groupMembers.groupId, groupId),
+		not(eq(groupMembers.userId, groups.leaderId))
+	];
 
 	if (cursor) {
 		conditions.push(lt(groupMembers.id, cursor));
@@ -350,7 +353,7 @@ export const getGroupMembers = async (input: z.infer<typeof getGroupMembersReque
 			groupMemberId: groupMembers.id,
 			name: users.name,
 			username: users.username,
-			image: users.image,
+			image: users.image
 		})
 		.from(groupMembers)
 		.innerJoin(groups, eq(groupMembers.groupId, groups.id))

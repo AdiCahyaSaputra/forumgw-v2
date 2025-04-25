@@ -9,7 +9,7 @@
 
 	let { data } = $props();
 
-  let open = $state(false);
+	let open = $state(false);
 
 	let userMutate = trpc($page).user.editUser.createMutation({
 		onSuccess: (data) => {
@@ -40,23 +40,23 @@
 
 <section class="p-4">
 	{#if data.user}
-		<UploadPpFormSection 
-      bind:open
-      user={data.user} 
-      onClientUploadComplete={(imageUrl: string) => {
-        $userMutate.mutate({ ...data.user, avatar: imageUrl });
-      }}
-    />
+		<UploadPpFormSection
+			bind:open
+			user={data.user}
+			onClientUploadComplete={(imageUrl: string) => {
+				$userMutate.mutate({ ...data.user, avatar: imageUrl });
+			}}
+		/>
 
-    <h2 class="text-lg font-bold mt-4">User Info</h2>
+		<h2 class="text-lg font-bold mt-4">User Info</h2>
 
-		<AccountFormSection 
-      formEdit={data.formEdit} 
-      user={data.user} 
-      onSubmit={(data) => {
-        $userMutate.mutate(data);
-      }}
-      isPending={$userMutate.isPending}
-    />
+		<AccountFormSection
+			formEdit={data.formEdit}
+			user={data.user}
+			onSubmit={(data) => {
+				$userMutate.mutate(data);
+			}}
+			isPending={$userMutate.isPending}
+		/>
 	{/if}
 </section>

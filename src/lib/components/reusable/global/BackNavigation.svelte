@@ -13,12 +13,8 @@
 	const { title, url = null, className = '' } = $props();
 </script>
 
-<div class={["sticky top-0 z-10 border-b bg-white p-4 flex items-center gap-2", className]}>
-	<Button
-		size="icon"
-		variant="outline"
-		onclick={() => goto(url ?? previousPage)}
-	>
+<div class={['sticky top-0 z-10 border-b bg-white p-4 flex items-center gap-2', className]}>
+	<Button size="icon" variant="outline" onclick={() => goto(url ?? previousPage)}>
 		<ChevronLeft />
 	</Button>
 	<p class="text-lg font-bold">{title}</p>

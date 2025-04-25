@@ -1,7 +1,5 @@
 <script lang="ts">
-    const {
-        username,
-    } = $props();
+	const { username } = $props();
 </script>
 
 <span>

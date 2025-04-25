@@ -22,8 +22,8 @@
 	import { toast } from 'svelte-sonner';
 	import { afterNavigate, goto } from '$app/navigation';
 	import type { UserPayload } from '$lib/trpc/services/user.js';
-  import {trpc} from '$lib/trpc/client';
-  import { page } from '$app/stores';
+	import { trpc } from '$lib/trpc/client';
+	import { page } from '$app/stores';
 
 	type Props = {
 		user: UserPayload | null;
@@ -34,7 +34,7 @@
 			url: '/discussion',
 			label: m.nav_item_discussion(),
 			icon: Rss
-		},
+		}
 		// {
 		// 	url: '/group',
 		// 	label: m.nav_item_group(),
@@ -47,7 +47,7 @@
 			url: '/manage-post',
 			label: m.nav_item_manage_post(),
 			icon: GanttChartSquare
-		},
+		}
 		// {
 		// 	url: '/manage-group',
 		// 	label: m.nav_item_manage_group(),
@@ -69,7 +69,7 @@
 	let isLoggingOut = $state(false);
 	let formResult: ActionResult | null = $state(null);
 
-  let notification = trpc($page).notification.getUserNotificationCounts.createQuery();
+	let notification = trpc($page).notification.getUserNotificationCounts.createQuery();
 
 	afterNavigate(() => {
 		openAside = false;
@@ -109,7 +109,11 @@
 			{#each navSettingItems as item, idx (idx)}
 				<NavItem {...item} />
 			{/each}
-			<NavItem url="/notification" label={`${$notification.data?.data.count || ''} ${m.nav_item_notification()}`} icon={BellRing} />
+			<NavItem
+				url="/notification"
+				label={`${$notification.data?.data.count || ''} ${m.nav_item_notification()}`}
+				icon={BellRing}
+			/>
 			<!-- <NavItem url="/invitation" label={`${1} ${m.nav_item_invite()}`} icon={Mail} /> -->
 		</ul>
 	</div>
@@ -136,7 +140,8 @@
 							</h3>
 						{/snippet}
 					</LoadingState>
-					<a href={`/profile/${user?.username}`} class="text-xs hover:underline">{m.see_profile()}</a
+					<a href={`/profile/${user?.username}`} class="text-xs hover:underline"
+						>{m.see_profile()}</a
 					>
 				</div>
 				<form

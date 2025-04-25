@@ -18,7 +18,7 @@
 
 	const postsInput = writable<PostsInput>({
 		tagIds: [],
-		onlyCurrentUser: false,
+		onlyCurrentUser: false
 	});
 
 	let triggerMorePostsElement: HTMLElement | null = $state(null);
@@ -79,7 +79,7 @@
 	{/snippet}
 
 	{#if $posts.data}
-		{#each $posts.data.pages.flatMap((page) => page.data.posts) as post, idx (idx)}
+		{#each $posts.data.pages.flatMap((page) => page.data.results) as post, idx (idx)}
 			<CardPost {post} />
 		{/each}
 

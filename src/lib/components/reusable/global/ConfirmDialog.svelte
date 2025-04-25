@@ -12,7 +12,16 @@
 		isPending: boolean;
 	};
 
-	let { open = $bindable(false), title, description, cancel, submit, onCancel, onSubmit, isPending }: Props = $props();
+	let {
+		open = $bindable(false),
+		title,
+		description,
+		cancel,
+		submit,
+		onCancel,
+		onSubmit,
+		isPending
+	}: Props = $props();
 </script>
 
 <AlertDialog.Root bind:open>

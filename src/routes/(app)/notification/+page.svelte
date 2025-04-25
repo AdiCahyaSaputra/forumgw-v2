@@ -59,10 +59,10 @@
 					<CardNotification
 						{notification}
 						onNotificationClick={() => {
-              if(!notification.isRead) {
-                $markAsReadMutate.mutate({ notificationId: notification.id });
-              }
-            }}
+							if (!notification.isRead) {
+								$markAsReadMutate.mutate({ notificationId: notification.id });
+							}
+						}}
 					/>
 				{/each}
 			</div>

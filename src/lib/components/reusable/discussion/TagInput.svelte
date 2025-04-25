@@ -46,8 +46,6 @@
 	}
 
 	$effect(() => {
-		
-
 		const timeout = setTimeout(() => {
 			const isExists = $allTags.data?.data.tags.find(
 				(tag) => tag.name.toLowerCase() === tagSearch.toLowerCase()

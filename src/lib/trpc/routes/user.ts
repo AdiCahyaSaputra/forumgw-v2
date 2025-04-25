@@ -4,14 +4,14 @@ import {
 	getUserForInviteRequest,
 	getUserForMentioningRequest,
 	editUserRequest,
-    getUserProfileRequest
+	getUserProfileRequest
 } from '../schema/userSchema';
 import {
 	getUserForInvite,
 	getUserForMentioning,
 	registeringNewUser,
 	editUser,
-    getUserProfile
+	getUserProfile
 } from '../services/user';
 import { t } from '../t';
 import { authenticateUser } from '../services/user';
@@ -37,11 +37,11 @@ export const user = t.router({
 		.use(authenticated)
 		.input(getUserForInviteRequest)
 		.query(({ input, ctx }) => getUserForInvite(input, ctx.user)),
-  getUserProfile: t.procedure
-    .use(logger)
-    .use(authenticated)
-    .input(getUserProfileRequest)
-    .query(({ input }) => getUserProfile(input)),
+	getUserProfile: t.procedure
+		.use(logger)
+		.use(authenticated)
+		.input(getUserProfileRequest)
+		.query(({ input }) => getUserProfile(input)),
 	editUser: t.procedure
 		.use(logger)
 		.use(authenticated)

@@ -6,7 +6,7 @@
 	import { page } from '$app/stores';
 	import LoadingState from '$lib/components/reusable/global/LoadingState.svelte';
 	import PostSection from '$lib/components/section/profile/PostSection.svelte';
-  import * as m from '$lib/paraglide/messages.js';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let openPreviewImage = $state(false);
 

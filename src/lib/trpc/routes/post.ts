@@ -1,19 +1,20 @@
 import { logger } from '$lib/trpc/middleware/logger';
 import {
-  createPostRequest,
-  deletePostRequest,
-  editPostRequest,
-  getPostDetailRequest,
-  getPublicPostDiscussionsRequest, reportPostRequest
+	createPostRequest,
+	deletePostRequest,
+	editPostRequest,
+	getPostDetailRequest,
+	getPublicPostDiscussionsRequest,
+	reportPostRequest
 } from '../schema/postSchema';
 import {
-  createNewPost,
-  deletePost,
-  editPost,
-  getPostDetail,
-  getPublicPostDiscussions,
-  getReportedPost,
-  reportPost
+	createNewPost,
+	deletePost,
+	editPost,
+	getPostDetail,
+	getPublicPostDiscussions,
+	getReportedPost,
+	reportPost
 } from '../services/post';
 import { t } from '../t';
 import { authenticated } from '../middleware/authenticated';

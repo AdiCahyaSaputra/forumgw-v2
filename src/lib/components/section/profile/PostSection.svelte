@@ -16,8 +16,8 @@
 
 	const postsInput = writable<PostsInput>({
 		tagIds: [],
-    userId,
-    onlyCurrentUser: false
+		userId,
+		onlyCurrentUser: false
 	});
 
 	let triggerMorePostsElement: HTMLElement | null = $state(null);
@@ -58,9 +58,9 @@
 			clearFilter={() => {
 				$postsInput.tagIds = [];
 			}}
-      {userId} 
+			{userId}
 			{selectedTags}
-      className="border-b-0"
+			className="border-b-0"
 		/>
 
 		<LoadingState isLoading={$posts.isPending}>

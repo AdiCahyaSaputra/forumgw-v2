@@ -45,12 +45,12 @@
 
 			disabledForRedirect = true;
 
-      toast.success('Registered!');
+			toast.success('Registered!');
 
 			await goto('/login', { replaceState: true });
 		},
 		onError: (error) => {
-      console.log(error);
+			console.log(error);
 
 			toast.error(m.global_error_message());
 		}
@@ -63,7 +63,7 @@
 
 			$registerMutate.mutate(data);
 
-      return false;
+			return false;
 		}
 	});
 

@@ -10,7 +10,7 @@
 	import CardPost from '$lib/components/reusable/discussion/CardPost.svelte';
 	import IntersectionObserver from 'svelte-intersection-observer';
 	import UpdatePostDialog from '$lib/components/reusable/manage-post/UpdatePostDialog.svelte';
-  import DeletePostDialog from '$lib/components/reusable/manage-post/DeletePostDialog.svelte';
+	import DeletePostDialog from '$lib/components/reusable/manage-post/DeletePostDialog.svelte';
 
 	type PostsInput = z.infer<ReturnType<typeof getPublicPostDiscussionsRequest>>;
 
@@ -77,7 +77,7 @@
 						{#snippet extraActions()}
 							<div class="flex justify-end grow gap-1">
 								<UpdatePostDialog {formEdit} {post} />
-                <DeletePostDialog postId={post.id} />
+								<DeletePostDialog postId={post.id} />
 							</div>
 						{/snippet}
 					</CardPost>

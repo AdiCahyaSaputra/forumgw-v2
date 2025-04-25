@@ -34,7 +34,7 @@ export const verifyUserToken = async (
 ): Promise<{ user: UserPayload | null }> => {
 	const user = await validateAuthSession(event.cookies.get('TOKEN'));
 
-	return { user }; 
+	return { user };
 };
 
 export const authenticateUser = async (formData: z.infer<LoginSchema>, ctx: CtxType) => {
@@ -69,7 +69,7 @@ export const authenticateUser = async (formData: z.infer<LoginSchema>, ctx: CtxT
 			message: 'ok'
 		},
 		{
-			token,
+			token
 		}
 	);
 };
@@ -85,12 +85,12 @@ export const registeringNewUser = async (formData: z.infer<RegisterSchema>) => {
 		.where(eq(users.username, username))
 		.limit(1);
 
-  if (isAlreadyRegistered.length > 0) {
-    return sendTRPCResponse({
-      status: 400,
-      message: m.register_already_exists()
-    });
-  }
+	if (isAlreadyRegistered.length > 0) {
+		return sendTRPCResponse({
+			status: 400,
+			message: m.register_already_exists()
+		});
+	}
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 

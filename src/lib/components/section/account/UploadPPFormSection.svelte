@@ -39,13 +39,13 @@
 
 	const { startUpload } = createUploadThing('imageUploader', {
 		onClientUploadComplete: (res) => {
-			(res);
+			res;
 
 			toast.success('Image uploaded successfully');
 
 			beginUpload = false;
 
-      onClientUploadComplete(res[0].ufsUrl);
+			onClientUploadComplete(res[0].ufsUrl);
 		}
 	});
 
@@ -94,7 +94,7 @@
 					}}
 					disabled={beginUpload}
 				>
-          {m.upload_profile_picture_delete()}
+					{m.upload_profile_picture_delete()}
 				</Button>
 			</div>
 		{/if}
@@ -118,7 +118,9 @@
 		/>
 	</div>
 
-	<Button class="w-full mt-4 lg:mt-0" disabled={!file || beginUpload} onclick={fileUploadHandler}>Upload</Button>
+	<Button class="w-full mt-4 lg:mt-0" disabled={!file || beginUpload} onclick={fileUploadHandler}
+		>Upload</Button
+	>
 </ResponsiveDialog>
 
 <div class="flex items-start gap-4">

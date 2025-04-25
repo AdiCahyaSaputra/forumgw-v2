@@ -105,8 +105,8 @@
 		<InviteUserInput bind:usernames={invitedUsername} />
 
 		<Button type="submit" disabled={$groupMutate.isPending} class="mt-20 w-full">
-      {m.group_create_button_submit()}
-    </Button>
+			{m.group_create_button_submit()}
+		</Button>
 	</form>
 </ResponsiveDialog>
 

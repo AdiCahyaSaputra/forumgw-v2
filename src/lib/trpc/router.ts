@@ -13,9 +13,9 @@ export const router = t.router({
 	post,
 	tag,
 	comment,
-  group,
+	group,
 	report,
-  notification
+	notification
 });
 
 export const createCaller = t.createCallerFactory(router);

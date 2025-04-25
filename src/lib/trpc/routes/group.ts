@@ -1,27 +1,27 @@
 import { authenticated } from '../middleware/authenticated';
 import { logger } from '../middleware/logger';
 import {
-  acceptInvitationRequest,
-  addNewMemberRequest,
-  createGroupRequest,
-  declineInvitationRequest,
-  deleteGroupRequest,
-  editGroupRequest,
-  getAllGroupsRequest,
-  getAvailableGroupsRequest,
-  getGroupMembersRequest
+	acceptInvitationRequest,
+	addNewMemberRequest,
+	createGroupRequest,
+	declineInvitationRequest,
+	deleteGroupRequest,
+	editGroupRequest,
+	getAllGroupsRequest,
+	getAvailableGroupsRequest,
+	getGroupMembersRequest
 } from '../schema/groupSchema';
 import {
-  acceptInvitation,
-  addNewMember,
-  createGroup,
-  declineInvitation,
-  deleteGroup,
-  editGroup,
-  getAllGroups,
-  getAvailableGroups,
-  getAvailableInvitation,
-  getGroupMembers
+	acceptInvitation,
+	addNewMember,
+	createGroup,
+	declineInvitation,
+	deleteGroup,
+	editGroup,
+	getAllGroups,
+	getAvailableGroups,
+	getAvailableInvitation,
+	getGroupMembers
 } from '../services/group';
 import { t } from '../t';
 

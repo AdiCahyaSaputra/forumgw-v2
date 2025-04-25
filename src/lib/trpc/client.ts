@@ -8,23 +8,23 @@ import { languageTag } from '$lib/paraglide/runtime';
 let browserClient: ReturnType<typeof svelteQueryWrapper<Router>>;
 
 export function trpc(init?: TRPCClientInit, queryClient?: QueryClient) {
-  const isBrowser = typeof window !== 'undefined';
-  if (isBrowser && browserClient) return browserClient;
+	const isBrowser = typeof window !== 'undefined';
+	if (isBrowser && browserClient) return browserClient;
 
-  const client = svelteQueryWrapper<Router>({
-    client: createTRPCClient<Router>({
-      init,
-      transformer,
-      headers() {
-        return {
-          'x-language': languageTag()
-        };
-      }
-    }),
-    queryClient
-  });
+	const client = svelteQueryWrapper<Router>({
+		client: createTRPCClient<Router>({
+			init,
+			transformer,
+			headers() {
+				return {
+					'x-language': languageTag()
+				};
+			}
+		}),
+		queryClient
+	});
 
-  if (isBrowser) browserClient = client;
+	if (isBrowser) browserClient = client;
 
-  return client;
+	return client;
 }

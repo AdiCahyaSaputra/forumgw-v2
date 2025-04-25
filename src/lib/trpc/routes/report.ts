@@ -23,5 +23,5 @@ export const report = t.router({
 		.use(authenticated)
 		.use(developer)
 		.input(safePostRequest)
-		.mutation(({ input }) => takeDownPost(input)),
+		.mutation(({ input }) => takeDownPost(input))
 });

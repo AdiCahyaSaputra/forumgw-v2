@@ -38,10 +38,8 @@ export const validateAuthSession = async (token?: string): Promise<UserPayload |
 		.catch(() => null);
 
 	if (decodedPayload) {
-		
-
 		// More than 10 days didn't scroll forumgw
-		if (Date.now() >= (new Date(decodedPayload.expiredIn)).getTime()) {
+		if (Date.now() >= new Date(decodedPayload.expiredIn).getTime()) {
 			await db.delete(jwts).where(eq(jwts.id, decodedPayload.id));
 
 			return null;
@@ -49,8 +47,8 @@ export const validateAuthSession = async (token?: string): Promise<UserPayload |
 
 		const thresholdDay = 5 * 24 * 60 * 60 * 1000; // 1/2 from 10 days
 
-		if (Date.now() >= (new Date(decodedPayload.expiredIn)).getTime() - thresholdDay) {
-      // Update the expiration token when the user come back after 1/2 from 10 days off
+		if (Date.now() >= new Date(decodedPayload.expiredIn).getTime() - thresholdDay) {
+			// Update the expiration token when the user come back after 1/2 from 10 days off
 			await db
 				.update(jwts)
 				.set({

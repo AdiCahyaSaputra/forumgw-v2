@@ -13,6 +13,9 @@
 	import { onMount } from 'svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 	import CommentInput from './CommentInput.svelte';
+	import { trpc } from '$lib/trpc/client';
+	import type { UserPayload } from '$lib/trpc/services/user';
+	import type { InfiniteData } from '@tanstack/svelte-query';
 
 	type Props = {
 		openEditComment: boolean;
@@ -20,56 +23,120 @@
 		text: string;
 		postId: string;
 		commentId: number;
+		user: UserPayload;
 	};
 
-	let { openEditComment = $bindable(false), formEditComment, postId, commentId, text }: Props = $props();
+	let {
+		openEditComment = $bindable(false),
+		formEditComment,
+		postId,
+		commentId,
+		text,
+		user
+	}: Props = $props();
 
-	let editCommentLoading = $state(false);
 	let formResult: ActionResult | null = $state(null);
 	let mentionedUserIds: string[] = $state([]);
 
 	let form = superForm(formEditComment, {
 		validators: zodClient(commentRequest()),
 		onSubmit: ({ formData }) => {
-			editCommentLoading = true;
-
 			formData.append('mentionUsers', mentionedUserIds.join(','));
-		},
-		onResult: async ({ result }) => {
-			formResult = result;
 
-			editCommentLoading = false;
-		},
-		onUpdate: async ({ result }) => {
-			switch (result.type) {
-				case 'failure':
-					toast.error(result.data?.message || m.global_error_message());
-					break;
-				case 'success':
-					trpcClientUtils($page).comment.getPostComments.invalidate();
-
-          // TODO: Trigger notification change using tRPC SSE (Server Send Event)
-
-					openEditComment = false;
-					break;
-				default:
-					toast.error(m.global_error_message());
-			}
-
-      formResult = null;
-		},
-		onError: () => {
-			toast.error(m.global_error_message());
+			$commentMutate.mutate({
+				text: formData.get('text') as string,
+				mentionUsers: formData.get('mentionUsers') as string,
+				postId,
+				commentId
+			});
 		}
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, reset } = form;
 
-  onMount(() => {
-    $formData.text = text;
+	let commentMutate = trpc($page).comment.editComment.createMutation({
+		onMutate: async (newComment) => {
+			openEditComment = false;
 
-    // Don't do anything if there is mentioned users on the old text 
-  });
+			await trpcClientUtils($page).comment.getPostComments.cancel();
+
+			const previousComments = trpcClientUtils($page).comment.getPostComments.getInfiniteData({
+				postId
+			});
+
+			trpcClientUtils($page).comment.getPostComments.setInfiniteData({ postId }, (old) => {
+				if (!old) return { pages: [], pageParams: [] };
+
+				const newPages = [...old.pages];
+
+				if (newPages.length > 0) {
+					const editedCommentIndex = newPages[0].data.results.findIndex(
+						(comment) => comment.id === commentId
+					);
+
+					newPages[0].data.results[editedCommentIndex].text = newComment.text;
+
+					// @ts-ignore
+					newPages[0].data.results[editedCommentIndex].statusLoading = true;
+				}
+
+				return {
+					...old,
+					newPages
+				};
+			});
+
+			return { previousComments };
+		},
+		onError: (error, variables, context: unknown) => {
+			const errCtx = context as { previousComments: InfiniteData<any> | undefined };
+
+			if (errCtx?.previousComments) {
+				trpcClientUtils($page).comment.getPostComments.setInfiniteData(
+					{ postId },
+					// @ts-ignore
+					() => errCtx.previousComments
+				);
+			}
+
+			toast.error(m.global_error_message());
+
+			formResult = {
+				type: 'error',
+				error: 'Cannot submit comment'
+			};
+		},
+		onSuccess: (data) => {
+			if (data.status !== 200) {
+				toast.error(m.global_error_message());
+
+				formResult = {
+					type: 'error',
+					error: 'Cannot submit comment'
+				};
+			}
+
+			formResult = {
+				type: 'success',
+				status: 201
+			};
+		},
+		onSettled: () => {
+			trpcClientUtils($page).comment.getPostComments.invalidate();
+
+			$formData.text = '';
+			$formData.mentionUsers = '';
+
+			$commentMutate.reset();
+			reset();
+		}
+	});
+
+	onMount(() => {
+		$formData.text = text;
+
+		// Don't do anything if there is mentioned users on the old text
+	});
 </script>
 
 <ResponsiveDialog
@@ -78,7 +145,7 @@
 	description={m.edit_comment_dialog_description()}
 	drawerClose={m.edit_comment_drawer_close()}
 >
-	<form method="POST" action="?/editComment" use:enhance>
+	<form method="POST" use:enhance>
 		<Form.Field {form} name="text">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -87,7 +154,7 @@
 						bind:mentionedUserIds
 						formResultType={formResult?.type}
 						defaultValue={text}
-            placeholder={m.comment_placeholder()}
+						placeholder={m.comment_placeholder()}
 						{...props}
 					/>
 				{/snippet}
@@ -113,7 +180,7 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<Button disabled={editCommentLoading} type="submit" class="mt-4 w-full">
+		<Button disabled={$commentMutate.isPending} type="submit" class="mt-4 w-full">
 			{m.edit_comment_submit()}
 		</Button>
 	</form>

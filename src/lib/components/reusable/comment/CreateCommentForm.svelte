@@ -38,16 +38,9 @@
 				mentionUsers: formData.get('mentionUsers') as string
 			});
 		},
-		onUpdate: async ({ result }) => {
-			if (result.type !== 'success') {
-				toast.error(result.data?.message || m.global_error_message());
-			}
-		}
 	});
 
 	const { form: formData, enhance, reset } = form;
-
-	$inspect($formData.text);
 
 	let commentMutate = trpc($page).comment.createComment.createMutation({
 		onMutate: async (newComment) => {
@@ -66,7 +59,7 @@
 
 					const randomNumber = Math.floor(Math.random() * 10) + Date.now();
 
-					newPages[0].data.comments = [
+					newPages[0].data.results = [
 						{
 							id: randomNumber,
 							text: newComment.text,
@@ -79,9 +72,11 @@
 								name: user.name,
 								image: user.image
 							},
-							createdAt: new Date()
+							createdAt: new Date(),
+							// @ts-ignore
+							statusLoading: true
 						},
-						...newPages[0].data.comments
+						...newPages[0].data.results
 					];
 
 				}
@@ -94,11 +89,14 @@
 
 			return { previousComments };
 		},
-		onError: (error, variables, context: { previousComments: InfiniteData<any> | undefined }) => {
-			if (context?.previousComments) {
+		onError: (error, variables, context: unknown) => {
+			const errCtx = context as { previousComments: InfiniteData<any> | undefined };
+
+			if (errCtx?.previousComments) {
 				trpcClientUtils($page).comment.getPostComments.setInfiniteData(
 					{ postId },
-					() => context.previousComments!
+					// @ts-ignore
+					() => errCtx.previousComments
 				);
 			}
 
@@ -109,7 +107,16 @@
 				error: 'Cannot submit comment'
 			};
 		},
-		onSuccess: () => {
+		onSuccess: (data) => {
+			if(data.status!== 201) {
+				toast.error(m.global_error_message());
+
+				formResult = {
+					type: 'error',
+					error: 'Cannot submit comment'
+				};
+			}
+
 			formResult = {
 				type: 'success',
 				status: 201
@@ -117,8 +124,6 @@
 		},
 		onSettled: () => {
 			trpcClientUtils($page).comment.getPostComments.invalidate();
-
-			('Comment submitted');
 
 			$formData.text = '';
 			$formData.mentionUsers = '';
@@ -130,7 +135,7 @@
 </script>
 
 <div class="border-b p-4">
-	<form method="POST" use:enhance class="flex items-start gap-2" action="?/createComment">
+	<form method="POST" use:enhance class="flex items-start gap-2">
 		<Form.Field {form} name="text" class="grow">
 			<Form.Control>
 				{#snippet children({ props })}

@@ -8,20 +8,20 @@
 	import { goto } from '$app/navigation';
 
 	type Props = {
-    notification: {
-      id: string;
-      type: string;
-      postId: string;
-      commentId: number | null;
-      isRead: boolean;
-      user: {
-        name: string;
-        username: string;
-        image: string | null;
-      };
-      createdAt: Date;
-    },
-    onNotificationClick: () => void
+		notification: {
+			id: string;
+			type: string;
+			postId: string;
+			commentId: number | null;
+			isRead: boolean;
+			user: {
+				name: string;
+				username: string;
+				image: string | null;
+			};
+			createdAt: Date;
+		};
+		onNotificationClick: () => void;
 	};
 
 	let { notification, onNotificationClick }: Props = $props();
@@ -41,18 +41,21 @@
 </script>
 
 <Card.Root
-	class={['w-full hover:border-primary cursor-pointer bg-secondary shadow', !notification.isRead && 'bg-primary text-white']}
-  onclick={() => {
-    let query = notification.postId;
+	class={[
+		'w-full hover:border-primary cursor-pointer bg-secondary shadow',
+		!notification.isRead && 'bg-primary text-white'
+	]}
+	onclick={() => {
+		let query = notification.postId;
 
-    if(notification.commentId) {
-      query += '?cid=' + notification.commentId;
-    }
+		if (notification.commentId) {
+			query += '?cid=' + notification.commentId;
+		}
 
-    onNotificationClick();
+		onNotificationClick();
 
-    goto(`/discussion/${query}`);
-  }}
+		goto(`/discussion/${query}`);
+	}}
 >
 	<Card.Header class="flex lg:gap-4 flex-row p-4 gap-2">
 		<Avatar.Root class="rounded-md border m-0">
@@ -63,12 +66,15 @@
 		</Avatar.Root>
 		<div class="flex grow justify-between items-center gap-4">
 			<div class="space-y-1">
-				<Card.Title class="line-clamp-1">{notification.user.name} (@{notification.user.username})</Card.Title>
+				<Card.Title class="line-clamp-1"
+					>{notification.user.name} (@{notification.user.username})</Card.Title
+				>
 				<Card.Description class={['cst-wrap-text', !notification.isRead && 'text-white/80']}>
-          {getNotifMessage(notification.type)} {timeAgo(notification.createdAt)}
-        </Card.Description>
+					{getNotifMessage(notification.type)}
+					{timeAgo(notification.createdAt)}
+				</Card.Description>
 			</div>
-      <ArrowRight />
+			<ArrowRight />
 		</div>
 	</Card.Header>
 </Card.Root>

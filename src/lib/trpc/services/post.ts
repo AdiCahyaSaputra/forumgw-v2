@@ -34,7 +34,7 @@ export const getPublicPostDiscussions = async (
 					message: 'You are not a member of this group'
 				},
 				{
-					posts: [],
+					results: [],
 					nextCursor: null,
 					hasNextPage: false
 				}
@@ -58,27 +58,24 @@ export const getPublicPostDiscussions = async (
 		conditions.push(eq(posts.userId, userId));
 	}
 
-  if (cursor) {
-    const cursorPost = await db
-      .select({ createdAt: posts.createdAt })
-      .from(posts)
-      .where(eq(posts.id, cursor))
-      .limit(1);
+	if (cursor) {
+		const cursorPost = await db
+			.select({ createdAt: posts.createdAt })
+			.from(posts)
+			.where(eq(posts.id, cursor))
+			.limit(1);
 
-    if (cursorPost.length > 0) {
-      conditions.push(
-        or(
-          lt(posts.createdAt, cursorPost[0].createdAt),
-          and(
-            eq(posts.createdAt, cursorPost[0].createdAt),
-            lt(posts.id, cursor)
-          )
-        )
-      );
-    } else {
-      conditions.push(lt(posts.id, cursor));
-    }
-  }
+		if (cursorPost.length > 0) {
+			conditions.push(
+				or(
+					lt(posts.createdAt, cursorPost[0].createdAt),
+					and(eq(posts.createdAt, cursorPost[0].createdAt), lt(posts.id, cursor))
+				)
+			);
+		} else {
+			conditions.push(lt(posts.id, cursor));
+		}
+	}
 
 	const results = await db
 		.select({
@@ -151,7 +148,7 @@ export const getPublicPostDiscussions = async (
 			message: 'ok'
 		},
 		{
-			posts: paginatedResults,
+			results: paginatedResults,
 			nextCursor,
 			hasNextPage
 		}
@@ -334,7 +331,13 @@ export const editPost = async (
 	input: z.infer<ReturnType<typeof editPostRequest>>,
 	user: UserPayload
 ) => {
-	const { isAnonymous, content: unfilteredPostContent, tags: unfilteredTagsName, groupId, postId } = input;
+	const {
+		isAnonymous,
+		content: unfilteredPostContent,
+		tags: unfilteredTagsName,
+		groupId,
+		postId
+	} = input;
 	const content = BadWordFilter(unfilteredPostContent);
 	const tagsName = unfilteredTagsName.map((tagName) => BadWordFilter(tagName));
 
@@ -362,7 +365,7 @@ export const editPost = async (
 				.where(eq(anonymous.userId, user.id))
 				.limit(1);
 
-			if(isAnonymousUserExists[0]) {
+			if (isAnonymousUserExists[0]) {
 				// If the post is already anonymous, then we need to verify for authorizing edit action
 				anonymousUserId = isAnonymousUserExists[0]?.id;
 			}
@@ -379,7 +382,7 @@ export const editPost = async (
 				}
 			}
 
-			if(anonymousUserId) {
+			if (anonymousUserId) {
 				authorizedPost.push(eq(posts.anonymousId, anonymousUserId));
 			}
 
@@ -472,7 +475,7 @@ export const deletePost = async (input: z.infer<typeof deletePostRequest>, user:
 			.where(eq(anonymous.userId, user.id))
 			.limit(1);
 
-		if(isAnonymousUserExists[0]) {
+		if (isAnonymousUserExists[0]) {
 			authorizedPost.push(eq(posts.anonymousId, isAnonymousUserExists[0].id));
 		}
 

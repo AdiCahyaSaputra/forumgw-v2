@@ -7,19 +7,20 @@
 	import ConfirmDialog from '$lib/components/reusable/global/ConfirmDialog.svelte';
 	import { writable } from 'svelte/store';
 	import { toast } from 'svelte-sonner';
-  import * as m from '$lib/paraglide/messages.js';
+	import * as m from '$lib/paraglide/messages.js';
 	import { trpcClientUtils } from '$lib/utils';
 
 	let open = $state(false);
 
-  let reportedMessageFilter = writable({
-    postId: ''
-  });
+	let reportedMessageFilter = writable({
+		postId: ''
+	});
 
 	const reportedPost = trpc($page).post.getReportedPost.createQuery();
-	const reportedPostMessages = trpc($page).report.getReportMessage.createQuery(reportedMessageFilter);
+	const reportedPostMessages =
+		trpc($page).report.getReportMessage.createQuery(reportedMessageFilter);
 
-  const safePostMutate = trpc($page).report.safePost.createMutation({
+	const safePostMutate = trpc($page).report.safePost.createMutation({
 		onSuccess: (data) => {
 			if (data.status !== 200) {
 				toast.error(data.message || m.global_error_message());
@@ -39,9 +40,9 @@
 		onSettled: () => {
 			$safePostMutate.reset();
 		}
-  });
+	});
 
-  const takeDownPostMutate = trpc($page).report.takeDownPost.createMutation({
+	const takeDownPostMutate = trpc($page).report.takeDownPost.createMutation({
 		onSuccess: (data) => {
 			if (data.status !== 201) {
 				toast.error(data.message || m.global_error_message());
@@ -61,7 +62,7 @@
 		onSettled: () => {
 			$takeDownPostMutate.reset();
 		}
-  });
+	});
 </script>
 
 <svelte:head>
@@ -70,7 +71,7 @@
 </svelte:head>
 
 <div class="p-4 border-b sticky top-0 bg-white">
-  <h1 class="text-lg font-bold">Reported Post</h1>
+	<h1 class="text-lg font-bold">Reported Post</h1>
 </div>
 
 <section>
@@ -86,7 +87,9 @@
 						<ConfirmDialog
 							bind:open
 							title="Report Messages"
-							description={$reportedPostMessages.data?.data.map((report) => report.message).join(', ')}
+							description={$reportedPostMessages.data?.data
+								.map((report) => report.message)
+								.join(', ')}
 							cancel={m.post_form_report_safe()}
 							submit={m.post_form_report_take_down()}
 							onCancel={() => $safePostMutate.mutate({ postId: post.id })}
@@ -94,15 +97,15 @@
 							isPending={$takeDownPostMutate.isPending}
 						/>
 
-						<Button 
-              onclick={() => {
-                open = true;
-                $reportedMessageFilter.postId = post.id;
-              }} 
-              variant="destructive"
-            >
-              {m.post_form_report_button()}
-            </Button>
+						<Button
+							onclick={() => {
+								open = true;
+								$reportedMessageFilter.postId = post.id;
+							}}
+							variant="destructive"
+						>
+							{m.post_form_report_button()}
+						</Button>
 					{/snippet}
 				</CardPost>
 			{/each}

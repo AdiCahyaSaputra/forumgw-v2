@@ -5,19 +5,19 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-  import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
 
-  import { Button } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import * as m from '$lib/paraglide/messages.js';
 
 	type EditUserRequest = ReturnType<typeof editUserRequest>;
-	type UserForm = { name: string; username: string; bio: string | null; avatar: string | null; };
+	type UserForm = { name: string; username: string; bio: string | null; avatar: string | null };
 
 	type Props = {
 		formEdit: SuperValidated<Infer<EditUserRequest>>;
 		user: UserPayload;
 		onSubmit: (data: UserForm) => void;
-    isPending: boolean;
+		isPending: boolean;
 	};
 
 	let { formEdit, user, onSubmit, isPending }: Props = $props();
@@ -27,11 +27,11 @@
 		onSubmit: ({ formData }) => {
 			const data = Object.fromEntries(formData) as unknown as UserForm;
 
-      data.avatar = user.image;
+			data.avatar = user.image;
 
 			onSubmit(data);
 		},
-    resetForm: false
+		resetForm: false
 	});
 
 	const { form: formData, enhance } = form;
@@ -83,5 +83,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-  <Button type="submit" class="mt-4" disabled={isPending}>{m.upload_profile_picture_form_submit()}</Button>
+	<Button type="submit" class="mt-4" disabled={isPending}
+		>{m.upload_profile_picture_form_submit()}</Button
+	>
 </form>
