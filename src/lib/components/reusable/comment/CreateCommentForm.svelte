@@ -14,7 +14,7 @@
 	import CommentInput from './CommentInput.svelte';
 	import { trpc } from '$lib/trpc/client';
 	import type { UserPayload } from '$lib/trpc/services/user';
-	import type { InfiniteData } from '@tanstack/svelte-query';
+	import { handleOnError, handleOptimisticUpdate } from '$lib/utils/optimistic';
 
 	type Props = {
 		formComment: SuperValidated<Infer<ReturnType<typeof commentRequest>>>;
@@ -50,57 +50,43 @@
 				postId
 			});
 
+			// @ts-ignore (statusLoading cause type error)
 			trpcClientUtils($page).comment.getPostComments.setInfiniteData({ postId }, (old) => {
-				if (!old) return { pages: [], pageParams: [] };
-
-				const newPages = [...old.pages];
-
-				if (newPages.length > 0) {
-
-					const randomNumber = Math.floor(Math.random() * 10) + Date.now();
-
-					newPages[0].data.results = [
-						{
-							id: randomNumber,
+				return handleOptimisticUpdate({
+					previousData: old,
+					operation: 'create',
+					entityData: {
+						id: null,
+						...newComment
+					},
+					customTransform: (item) => {
+						return {
+							...item,
 							text: newComment.text,
-							postId: postId,
-							_count: {
-								replies: 0
-							},
 							user: {
 								username: user.username,
 								name: user.name,
 								image: user.image
 							},
 							createdAt: new Date(),
-							// @ts-ignore
-							statusLoading: true
-						},
-						...newPages[0].data.results
-					];
-
-				}
-
-				return {
-					...old,
-					newPages
-				};
+							_count: {
+								replies: 0
+							},
+						}
+					}
+				});
 			});
 
 			return { previousComments };
 		},
 		onError: (error, variables, context: unknown) => {
-			const errCtx = context as { previousComments: InfiniteData<any> | undefined };
-
-			if (errCtx?.previousComments) {
+			handleOnError(context, (errCtx) => {
 				trpcClientUtils($page).comment.getPostComments.setInfiniteData(
 					{ postId },
 					// @ts-ignore
 					() => errCtx.previousComments
 				);
-			}
-
-			toast.error(m.global_error_message());
+			});
 
 			formResult = {
 				type: 'error',

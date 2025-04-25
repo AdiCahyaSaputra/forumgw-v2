@@ -5,18 +5,50 @@
 	import { page } from '$app/stores';
 	import { trpcClientUtils } from '$lib/utils';
 	import { toast } from 'svelte-sonner';
+	import { handleOptimisticUpdate, handleOnError } from '$lib/utils/optimistic';
 
-	let { commentId, open = $bindable(false) } = $props();
+	let { commentId, postId, open = $bindable(false) } = $props();
 
 	const deleteComment = trpc().comment.deleteComment.createMutation({
-		onSuccess: () => {
+		onMutate: async (deletedComment) => {
+			open = false;
+
+			await trpcClientUtils($page).comment.getPostComments.cancel();
+			await trpcClientUtils($page).post.getPostDetail.cancel();
+
+			const previousComments = trpcClientUtils($page).comment.getPostComments.getInfiniteData({
+				postId
+			});
+
+			// @ts-ignore	(statusLoading cause type error)
+			trpcClientUtils($page).comment.getPostComments.setInfiniteData({ postId }, (old) => {
+					return handleOptimisticUpdate({
+						previousData: old,
+						operation: 'delete',
+						entityData: {
+							id: deletedComment.commentId
+						},
+						findIndex: (item) => item.id === deletedComment.commentId
+					});
+				}
+			);
+
+			return { previousComments };
+		},
+		onSettled: () => {
 			trpcClientUtils($page).comment.getPostComments.invalidate();
 			trpcClientUtils($page).post.getPostDetail.invalidate();
 
 			open = false;
 		},
-		onError: () => {
-			toast.error(m.global_error_message());
+		onError: (error, variables, context: unknown) => {
+			handleOnError(context, (errCtx) => {
+				trpcClientUtils($page).comment.getPostComments.setInfiniteData(
+					{ postId },
+					// @ts-ignore
+					() => errCtx.previousResults
+				);
+			});
 		}
 	});
 </script>

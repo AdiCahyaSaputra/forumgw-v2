@@ -15,7 +15,7 @@
 	import CommentInput from './CommentInput.svelte';
 	import { trpc } from '$lib/trpc/client';
 	import type { UserPayload } from '$lib/trpc/services/user';
-	import type { InfiniteData } from '@tanstack/svelte-query';
+	import { handleOnError, handleOptimisticUpdate } from '$lib/utils/optimistic';
 
 	type Props = {
 		openEditComment: boolean;
@@ -64,42 +64,35 @@
 				postId
 			});
 
+			// @ts-ignore (statusLoading cause type error)
 			trpcClientUtils($page).comment.getPostComments.setInfiniteData({ postId }, (old) => {
-				if (!old) return { pages: [], pageParams: [] };
-
-				const newPages = [...old.pages];
-
-				if (newPages.length > 0) {
-					const editedCommentIndex = newPages[0].data.results.findIndex(
-						(comment) => comment.id === commentId
-					);
-
-					newPages[0].data.results[editedCommentIndex].text = newComment.text;
-
-					// @ts-ignore
-					newPages[0].data.results[editedCommentIndex].statusLoading = true;
-				}
-
-				return {
-					...old,
-					newPages
-				};
+				return handleOptimisticUpdate({
+					previousData: old,
+					operation: 'update',
+					entityData: {
+						id: newComment.commentId as number,
+						...newComment
+					},
+					findIndex: (item) => item.id === newComment.commentId,
+					customTransform: (item) => {
+						return {
+							...item,
+							text: newComment.text,
+						}
+					}
+				});
 			});
 
 			return { previousComments };
 		},
 		onError: (error, variables, context: unknown) => {
-			const errCtx = context as { previousComments: InfiniteData<any> | undefined };
-
-			if (errCtx?.previousComments) {
+			handleOnError(context, (errCtx) => {
 				trpcClientUtils($page).comment.getPostComments.setInfiniteData(
 					{ postId },
 					// @ts-ignore
-					() => errCtx.previousComments
+					() => errCtx.previousResults
 				);
-			}
-
-			toast.error(m.global_error_message());
+			})
 
 			formResult = {
 				type: 'error',

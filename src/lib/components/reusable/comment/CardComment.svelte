@@ -96,7 +96,7 @@
 				user={currentUser}
 			/>
 
-			<DeleteCommentDialog commentId={comment.id} bind:open={openDeleteComment} />
+			<DeleteCommentDialog commentId={comment.id} postId={comment.postId} bind:open={openDeleteComment} />
 
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger>
