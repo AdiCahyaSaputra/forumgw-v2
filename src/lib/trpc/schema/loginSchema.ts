@@ -10,7 +10,7 @@ export const loginSchema = () =>
 		password: z
 			.string()
 			.min(8, m.validation_min({ length: 8, field: 'password' }))
-			.max(10, m.validation_max({ length: 10, field: 'password' }))
+			.max(255, m.validation_max({ length: 255, field: 'password' }))
 	});
 
 export type LoginSchema = ReturnType<typeof loginSchema>;
