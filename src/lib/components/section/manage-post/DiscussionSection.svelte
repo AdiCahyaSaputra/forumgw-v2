@@ -72,7 +72,7 @@
 			{/snippet}
 
 			{#if $posts.data}
-				{#each $posts.data.pages.flatMap((page) => page.data.posts) as post, idx (idx)}
+				{#each $posts.data.pages.flatMap((page) => page.data.results) as post, idx (idx)}
 					<CardPost {post}>
 						{#snippet extraActions()}
 							<div class="flex justify-end grow gap-1">
