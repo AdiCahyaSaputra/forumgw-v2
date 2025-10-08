@@ -14,7 +14,8 @@
 		"format": "prettier --write .",
 		"db:push": "drizzle-kit push",
 		"db:migrate": "drizzle-kit migrate",
-		"db:studio": "drizzle-kit studio"
+		"db:studio": "drizzle-kit studio",
+		"db:seed": "tsx src/lib/server/db/seed.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
@@ -46,6 +47,7 @@
 		"tailwind-variants": "^0.3.1",
 		"tailwindcss": "^4.0.11",
 		"tailwindcss-animate": "^1.0.7",
+		"tsx": "^4.20.6",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.20.0",
 		"vaul-svelte": "1.0.0-next.6",
