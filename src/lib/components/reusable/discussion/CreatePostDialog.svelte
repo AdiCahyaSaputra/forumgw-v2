@@ -7,7 +7,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { createPostRequest } from '$lib/trpc/schema/postSchema';
 	import { trpcClientUtils } from '$lib/utils';
-	import { Plus, VenetianMask } from '@lucide/svelte';
+	import { Newspaper, VenetianMask } from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -117,7 +117,7 @@
 	</form>
 </ResponsiveDialog>
 
-<Button class="w-full" onclick={() => (open = true)}>
-	<Plus />
+<Button class="w-full" size="lg" onclick={() => (open = true)}>
+	<Newspaper />
 	{m.post_button_new()}
 </Button>

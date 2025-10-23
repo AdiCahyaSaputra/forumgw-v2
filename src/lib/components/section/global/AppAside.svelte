@@ -7,16 +7,13 @@
 	import { enhance } from '$app/forms';
 	import {
 		BellRing,
-		CircleDashed,
 		GanttChartSquare,
 		Loader2,
 		LogOut,
-		Mail,
 		Megaphone,
 		Menu,
 		Rss,
-		User,
-		Users
+		User
 	} from '@lucide/svelte';
 	import type { ActionResult } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
@@ -78,7 +75,7 @@
 
 <aside
 	class={`
-        lg:border-r p-4 flex flex-col justify-between lg:w-1/5 lg:h-[100vh] h-[100dvh] lg:sticky lg:top-0
+        lg:border-r p-4 flex flex-col justify-between lg:w-2/12 lg:h-[100vh] h-[100dvh] lg:sticky lg:top-0
         lg:z-10
         bg-slate-50 lg:translate-y-0 transition-transform
         fixed inset-0 ${openAside ? 'translate-y-0' : '-translate-y-[200%]'}
@@ -134,11 +131,9 @@
 								user
 							</h3>
 						{/snippet}
-						{#snippet children()}
-							<h3 class="text-sm leading-none font-bold">
-								{`@${user?.username}`.slice(0, 20)}
-							</h3>
-						{/snippet}
+						<h3 class="text-sm leading-none font-bold">
+							{`@${user?.username}`.slice(0, 20)}
+						</h3>
 					</LoadingState>
 					<a href={`/profile/${user?.username}`} class="text-xs hover:underline"
 						>{m.see_profile()}</a
@@ -170,13 +165,14 @@
 					<Button
 						type="submit"
 						variant="destructive"
-						class="w-max"
+						size="icon"
+						class="w-max p-2"
 						disabled={isLoggingOut || formResult?.type === 'success'}
 					>
 						{#if isLoggingOut || formResult?.type === 'success'}
-							<Loader2 class="w-4 aspect-square animate-spin" />
+							<Loader2 class="w-4 h-4 aspect-square animate-spin" />
 						{:else}
-							<LogOut class="w-4 aspect-square" />
+							<LogOut class="w-4 h-4 aspect-square" />
 						{/if}
 					</Button>
 				</form>
