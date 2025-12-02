@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { roles } from './schema';
+import { roles } from './schema/roles';
+import 'dotenv/config';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
