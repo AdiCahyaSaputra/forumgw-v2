@@ -1,10 +1,10 @@
-import { createPostRequest } from '$lib/trpc/schema/postSchema';
-import { type Actions } from '@sveltejs/kit';
+import type { Actions } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import type { PageServerLoad } from './$types';
+import { createPostRequest } from '$lib/trpc/schema/postSchema';
 import { invalidateAllAuthSession } from '$lib/trpc/services/auth';
 import { verifyUserToken } from '$lib/trpc/services/user';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
 	return {

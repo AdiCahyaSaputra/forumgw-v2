@@ -1,6 +1,6 @@
-import { redirect, type Handle } from '@sveltejs/kit';
-import { i18n } from '$lib/i18n';
+import { type Handle, redirect } from '@sveltejs/kit';
 import { createTRPCHandle } from 'trpc-sveltekit';
+import { i18n } from '$lib/i18n';
 import { createContext } from '$lib/trpc/context';
 import { router } from '$lib/trpc/router';
 import { verifyUserToken } from '$lib/trpc/services/user';
@@ -33,8 +33,6 @@ const handleTRPC: Handle = createTRPCHandle({ router, createContext });
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const pathname = event.url.pathname;
-
-	console.log(pathname);
 
 	if (pathname === '/') throw redirect(303, '/login');
 

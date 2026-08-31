@@ -1,20 +1,20 @@
-import * as m from '$lib/paraglide/messages.js';
-import { db } from '$lib/server/db';
-import { groupMembers, roles, users } from '$lib/server/db/schema';
-import type { LoginSchema } from '$lib/trpc/schema/loginSchema.js';
-import type { RegisterSchema } from '$lib/trpc/schema/registerSchema.js';
-import { sendTRPCResponse } from '$lib/utils.js';
 import type { RequestEvent } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import { and, eq, ilike, not } from 'drizzle-orm';
-import { z } from 'zod';
+import type { z } from 'zod';
+import type { CtxType } from '$lib/constant';
+import * as m from '$lib/paraglide/messages.js';
+import { db } from '$lib/server/db';
+import { groupMembers, type roles, users } from '$lib/server/db/schema';
+import type { LoginSchema } from '$lib/trpc/schema/loginSchema.js';
+import type { RegisterSchema } from '$lib/trpc/schema/registerSchema.js';
+import { sendTRPCResponse } from '$lib/utils.js';
 import type {
 	editUserRequest,
 	getUserForInviteRequest,
 	getUserForMentioningRequest,
 	getUserProfileRequest
 } from '../schema/userSchema';
-import type { CtxType } from '$lib/constant';
 import { createAuthSession, validateAuthSession } from './auth';
 
 type User = typeof users.$inferSelect;
