@@ -70,9 +70,9 @@
 
 	<form method="POST" use:enhance class="mt-4 w-full lg:w-1/2">
 		<Form.Field {form} name="oldPassword">
-			<Form.Label>{m.account_password_old()}</Form.Label>
 			<Form.Control>
 				{#snippet children({ props })}
+					<Form.Label>{m.account_password_old()}</Form.Label>
 					<Input
 						{...props}
 						type="password"
@@ -86,9 +86,9 @@
 		</Form.Field>
 
 		<Form.Field {form} name="newPassword">
-			<Form.Label>{m.account_password_new()}</Form.Label>
 			<Form.Control>
 				{#snippet children({ props })}
+					<Form.Label>{m.account_password_new()}</Form.Label>
 					<Input
 						{...props}
 						type="password"
@@ -102,9 +102,9 @@
 		</Form.Field>
 
 		<Form.Field {form} name="confirmNewPassword">
-			<Form.Label>{m.account_password_confirm()}</Form.Label>
 			<Form.Control>
 				{#snippet children({ props })}
+					<Form.Label>{m.account_password_confirm()}</Form.Label>
 					<Input
 						{...props}
 						type="password"

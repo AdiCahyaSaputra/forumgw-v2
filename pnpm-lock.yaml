@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  buffer-equal-constant-time@1.0.1: 4d2d71c8d59afde289eb1cc1a81e4fdb44364bdc26dbb53795c2c3fa318807a2
+
 importers:
 
   .:
@@ -4691,7 +4694,7 @@ snapshots:
 
   btoa-lite@1.0.0: {}
 
-  buffer-equal-constant-time@1.0.1: {}
+  buffer-equal-constant-time@1.0.1(patch_hash=4d2d71c8d59afde289eb1cc1a81e4fdb44364bdc26dbb53795c2c3fa318807a2): {}
 
   buffer-from@1.1.2: {}
 
@@ -5380,7 +5383,7 @@ snapshots:
 
   jwa@1.4.1:
     dependencies:
-      buffer-equal-constant-time: 1.0.1
+      buffer-equal-constant-time: 1.0.1(patch_hash=4d2d71c8d59afde289eb1cc1a81e4fdb44364bdc26dbb53795c2c3fa318807a2)
       ecdsa-sig-formatter: 1.0.11
       safe-buffer: 5.2.1
 
