@@ -10,6 +10,7 @@ import type { LoginSchema } from '$lib/trpc/schema/loginSchema.js';
 import type { RegisterSchema } from '$lib/trpc/schema/registerSchema.js';
 import { sendTRPCResponse } from '$lib/utils.js';
 import type {
+	changePasswordRequest,
 	editUserRequest,
 	getUserForInviteRequest,
 	getUserForMentioningRequest,
@@ -224,6 +225,30 @@ export const editUser = async (
 		.catch(() => sendTRPCResponse({ status: 500, message: 'Error edit user' }));
 
 	return response;
+};
+
+export const changePassword = async (
+	input: z.infer<typeof changePasswordRequest>,
+	user: UserPayload
+) => {
+	const [storedUser] = await db
+		.select({ password: users.password })
+		.from(users)
+		.where(eq(users.id, user.id))
+		.limit(1);
+
+	if (!storedUser || !(await bcrypt.compare(input.oldPassword, storedUser.password))) {
+		return sendTRPCResponse({ status: 400, message: m.account_password_current_incorrect() });
+	}
+
+	try {
+		const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+		await db.update(users).set({ password: hashedPassword }).where(eq(users.id, user.id));
+
+		return sendTRPCResponse({ status: 200, message: m.account_password_success() });
+	} catch {
+		return sendTRPCResponse({ status: 500, message: m.global_error_message() });
+	}
 };
 
 export const getUserProfile = async (input: z.infer<typeof getUserProfileRequest>) => {

@@ -3,6 +3,7 @@ import { authenticated } from '../middleware/authenticated';
 import {
 	getUserForInviteRequest,
 	getUserForMentioningRequest,
+	changePasswordRequest,
 	editUserRequest,
 	getUserProfileRequest
 } from '../schema/userSchema';
@@ -11,6 +12,7 @@ import {
 	getUserForMentioning,
 	registeringNewUser,
 	editUser,
+	changePassword,
 	getUserProfile
 } from '../services/user';
 import { t } from '../t';
@@ -46,5 +48,10 @@ export const user = t.router({
 		.use(logger)
 		.use(authenticated)
 		.input(editUserRequest(null))
-		.mutation(({ input, ctx }) => editUser(input, ctx.user))
+		.mutation(({ input, ctx }) => editUser(input, ctx.user)),
+	changePassword: t.procedure
+		.use(logger)
+		.use(authenticated)
+		.input(changePasswordRequest)
+		.mutation(({ input, ctx }) => changePassword(input, ctx.user))
 });

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import UploadPpFormSection from '$lib/components/section/account/UploadPPFormSection.svelte';
 	import AccountFormSection from '$lib/components/section/account/AccountFormSection.svelte';
+	import ChangePasswordFormSection from '$lib/components/section/account/ChangePasswordFormSection.svelte';
 	import { page } from '$app/stores';
 	import { trpc } from '$lib/trpc/client';
 	import { invalidate } from '$app/navigation';
@@ -58,5 +59,7 @@
 			}}
 			isPending={$userMutate.isPending}
 		/>
+
+		<ChangePasswordFormSection formChangePassword={data.formChangePassword} />
 	{/if}
 </section>
